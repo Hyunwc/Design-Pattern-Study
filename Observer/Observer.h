@@ -5,8 +5,9 @@
 class Observer
 {
 public:
-	//push
-	virtual void Update(string news, string date) = 0;
+	//옵저버의 정보 업데이트
+	virtual void Update(const string& news, const string& date) = 0;
+	//옵저버의 정보 출력
 	virtual void ShowDisplay() = 0;
 };
 
@@ -14,6 +15,7 @@ public:
 class Subject
 {
 public:
+	//옵저버 추가
 	virtual void Add(Observer* observer) = 0;
 	virtual void notify() = 0;
 };

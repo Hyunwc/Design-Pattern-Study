@@ -4,14 +4,12 @@
 class Person : public Observer
 {
 private:
-	string m_name;
-	string m_news;
-	string m_date;
+	string m_name, m_news, m_date;
 public:
 	Person(string name) {
 		m_name = name;
 	}
-	void Update(string news, string date) override {
+	void Update(const string& news, const string& date) override {
 		m_news = news;
 		m_date = date;
 	}
