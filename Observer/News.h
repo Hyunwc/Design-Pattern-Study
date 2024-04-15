@@ -7,6 +7,7 @@ class News : public Subject
 {
 private:
 	static News* instance;
+	//중복된 고객이 있으면 안되니까 vector보다는 set으로
 	vector<Observer*> observers;
 	string m_date, m_newsinfo;
 
@@ -90,11 +91,11 @@ public:
 			case 3:
 			{
 				//뉴스 업데이트(뉴스 작성한 시간과 뉴스 내용이 업데이트가 전송된다)
-				string news;
 				cout << "새로운 기사 내용을 입력 해주세요 : ";
 				cin.ignore(); // 입력 버퍼 비우기
-				getline(cin, news); // 한 줄 전체를 입력 받음
-				UpdateNews(news);
+				getline(cin, m_newsinfo); // 한 줄 전체를 입력 받음				
+				m_date = currentDateTime();
+				//UpdateNews(news);
 				break;
 			}
 			case 4:

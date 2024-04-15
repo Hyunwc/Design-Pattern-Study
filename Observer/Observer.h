@@ -9,6 +9,8 @@ public:
 	virtual void Update(const string& news, const string& date) = 0;
 	//옵저버의 정보 출력
 	virtual void ShowDisplay() = 0;
+
+	virtual ~Observer(){ }
 };
 
 //관찰대상자 인터페이스
@@ -18,4 +20,6 @@ public:
 	//옵저버 추가
 	virtual void Add(Observer* observer) = 0;
 	virtual void notify() = 0;
+
+	virtual ~Subject(){ }
 };
