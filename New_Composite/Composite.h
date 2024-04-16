@@ -15,7 +15,7 @@ public:
 	//상속받은 함수 재정의
 	void Operation() override
 	{
-		// *& ??
+		// *& ?? (*Component)& 와 같다.
 		for (Component*& component : components)
 			component->Operation();
 	}
@@ -23,6 +23,7 @@ public:
 	//컴포넌트 추가
 	void AddComponent(Component* component)
 	{
+		//component가 nullptr이 아닐때 벡터에 삽입
 		if (component)
 			components.push_back(component);
 	}
