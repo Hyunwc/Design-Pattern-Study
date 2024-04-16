@@ -1,0 +1,13 @@
+추상 팩토리
+팩토리 메소드는 하나의 객체만 생성가능하지만 추상 팩토리는
+여러 객체를 생성 가능하다.
+
+실체화 : 인터페이스를 재정의하여 기능을 구현한 클래스
+
+AbstractProduct : 생성될 객체의 인터페이스
+(Concrete)Product : AbstractProduct 인터페이스를 실체화한 클래스
+AbstractFactory : Product 객체를 만드는 함수들을 가지는 인터페이스
+ConcreteFactory : AbstractFactory 인터페이스를 실체화한 클래스
+ㄴ ConcreteFactory는 Product를 참조한다.
+Client : ConcreteFactory를 이용하여 만들어진 Product를 연관 관계로 제공
+ㄴ Client가 Product 참조 또는 반대로. 또는 서로가 참조
