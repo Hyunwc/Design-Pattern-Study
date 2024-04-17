@@ -56,19 +56,19 @@ class KnightEquipment : public EquipmentAbstractFactory
 	Armor* CreateArmor() const override { return new FullPlateArmor; }
 };
 
-class BerserkerEquiment : public EquipmentAbstractFactory
+class BerserkerEquipment : public EquipmentAbstractFactory
 {
 	Weapon* CreateWeaopn() const override { return new GreatSword; }
 	Armor* CreateArmor() const override { return new LeatherArmor; }
 };
 
-class SorceressEquiment : public EquipmentAbstractFactory
+class SorceressEquipment : public EquipmentAbstractFactory
 {
 	Weapon* CreateWeaopn() const override { return new Staft; }
 	Armor* CreateArmor() const override { return new Robe; }
 };
 
-class SummonerEquiment : public EquipmentAbstractFactory
+class SummonerEquipment : public EquipmentAbstractFactory
 {
 	Weapon* CreateWeaopn() const override { return new Wand; }
 	Armor* CreateArmor() const override { return new Robe; }
@@ -82,6 +82,7 @@ private:
 	Weapon* weapon;
 	Armor* armor;
 public:
+	//여러 객체를 생성하는곳 
 	Character(const EquipmentAbstractFactory* equiment)
 	{
 		weapon = equiment->CreateWeaopn();

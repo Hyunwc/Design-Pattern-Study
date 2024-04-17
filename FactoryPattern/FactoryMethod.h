@@ -42,6 +42,7 @@ public:
 	virtual ~CharacterCreator(){} //가상 소멸자
 	//팩토리 메소드
 	//Product(캐릭터를 참조한다)
+	//여기서 생성
 	virtual Character* Create(int id) abstract; 
 };
 
