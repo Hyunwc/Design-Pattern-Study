@@ -1,20 +1,23 @@
 #include "Miner.h"
 #include "MinerOwnedStates.h"
 #include <cassert>
+#include <cstdlib>
+#include <time.h>
 
 Miner::Miner(const int& id) :
 	BaseGameEntity(id),
-	m_Location(Location_Type::shack),
-	m_nGoldCarried(0),
-	m_nMoneyInBank(0),
-	m_nThirst(0),
-	m_nFatigue(0),
-	m_pCurrState(GoHomeAndSleepTilRested::Instance()) { }
+	//m_Location(Location_Type::shack),
+	m_Condition(0),
+	m_Knowledge(0),
+	m_HourCount(0),
+	m_pCurrState(Home::Instance()) {
+	srand((unsigned int)time(0));
+}
 
 void Miner::Update()
 {
 	//갈증도 + 1
-	m_nThirst += 1;
+	//m_nThirst += 1;
 
 	//상태가 nullptr이 아닐때 상태 변경?
 	if (m_pCurrState)
@@ -33,40 +36,49 @@ void Miner::ChangeState(State* pState)
 	m_pCurrState->Enter(this);
 }
 
-void Miner::AddToGoldCarried(const int& value)
+void Miner::AddToCondition(const int& value)
 {
-	m_nGoldCarried += value;
-	if (m_nGoldCarried < 0)
+	m_Condition += value;
+	if (m_Condition < 0)
 	{
-		m_nGoldCarried = 0;
+		m_Condition = 0;
 	}
 }
 
-void Miner::AddToWealth(const int& value)
+void Miner::AddToKnowledge(const int& value)
 {
-	m_nMoneyInBank += value;
-	if (m_nMoneyInBank < 0)
+	m_Knowledge += value;
+	if (m_Knowledge < 0)
 	{
-		m_nMoneyInBank = 0;
+		m_Knowledge = 0;
 	}
 }
 
-bool Miner::Thirsty() const
-{
-	if (THIRST_LEVEL <= m_nThirst)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool Miner::Fatigued() const
-{
-	if (TIREDNESS_THRESHOLD < m_nFatigue)
-	{
-		return true;
-	}
-
-	return false;
-}
+//void Miner::AddToWealth(const int& value)
+//{
+//	m_nMoneyInBank += value;
+//	if (m_nMoneyInBank < 0)
+//	{
+//		m_nMoneyInBank = 0;
+//	}
+//}
+//
+//bool Miner::Thirsty() const
+//{
+//	if (THIRST_LEVEL <= m_nThirst)
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}
+//
+//bool Miner::Fatigued() const
+//{
+//	if (TIREDNESS_THRESHOLD < m_nFatigue)
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}

@@ -7,10 +7,11 @@
 int main()
 {
 	Miner miner(ent_Miner_Bob);
+	Miner elsa(ent_Elsa);
 
 	for (int i = 0; 20 > i; i++)
 	{
-		miner.Update();
+		elsa.Update();
 
 		Sleep(1000);
 	}

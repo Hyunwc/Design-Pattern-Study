@@ -2,205 +2,253 @@
 #include "EntityNames.h"
 #include "ConsoleUtils.h"
 
-// EnterMineAndDigForNugget ------------------------------------
-EnterMineAndDigForNugget* EnterMineAndDigForNugget::Instance()
+// 수업 시간  ------------------------------------
+Study* Study::Instance()
 {
 	//인스턴스 반환
-	static EnterMineAndDigForNugget instance;
+	static Study instance;
 	return &instance;
 }
 
-void EnterMineAndDigForNugget::Enter(Miner* pMiner)
-{
-	//pMiner의 위치가 광산이 아니면 출력 후 위치를 광산으로 변경
-	if (pMiner->Location() != Location_Type::gold_mine)
-	{
-		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":광산으로 걸어간다" << std::endl;
-
-		pMiner->ChangeLocation(Location_Type::gold_mine);
-	}
-}
-//광산의 재정의된 Excute는 금덩이를 채고 피로도가 증가하며 주머니가 가득차면 은행으로 전환
-//갈증도가 최대치면 갈증해소로 전환
-void EnterMineAndDigForNugget::Excute(Miner* pMiner)
-{
-	//금덩이 1개 채굴
-	pMiner->AddToGoldCarried(1);
-	//피로도 1증가
-	pMiner->IncreaseFatigue();
-
-	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-	std::cout << GetNameOfEntity(pMiner->ID()) << ":금덩이 1개를 채굴" << std::endl;
-
-	// 주머니가 가득차면,
-	if (pMiner->PocketsFull())
-	{
-		// 저금을 위해 은행 방문.
-		pMiner->ChangeState(VisitBankAndDepositGold::Instance());
-	}
-
-	// 목이 마르면,
-	if (pMiner->Thirsty())
-	{
-		// 목마름 해소를 위해 행동.
-		pMiner->ChangeState(QuenchThirst::Instance());
-	}
-}
-
-void EnterMineAndDigForNugget::Exit(Miner* pMiner)
+void Study::Enter(Miner* pMiner)
 {
 	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-	std::cout << GetNameOfEntity(pMiner->ID()) << ":금덩이 " << pMiner->GoldCarried() << "개를 가지고 광산을 떠난다" << std::endl;
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":수업 시간이다....." << std::endl;
 }
-// -------------------------------------------------------------
-
-// VisitBankAndDepositGold ------------------------------------
-VisitBankAndDepositGold* VisitBankAndDepositGold::Instance()
+//수업 시간의 재정의된 Excute는 나쁜 컨디션이 아니라면 수업을 잘 들어 지식증가. 나쁜 컨디션이라면 깜빡 졸아 지식증가x 컨디션 감소 x 
+void Study::Excute(Miner* pMiner)
 {
-	static VisitBankAndDepositGold instance;
-	return &instance;
-}
-
-void VisitBankAndDepositGold::Enter(Miner* pMiner)
-{
-	//현재 위치가 은행이 아니라면 위치를 은행으로 변경
-	if (pMiner->Location() != Location_Type::bank)
+	//여기서 나쁜 컨디션이 아니라면 수업을 잘 들어 지식량 증가
+	if (pMiner->GetCondition() > BAD_CONDITION)
 	{
+		pMiner->IncreaseKnowledge();
+		pMiner->DecreaseCondition();
 		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":은행으로 이동" << std::endl;
-
-		pMiner->ChangeLocation(Location_Type::bank);
-	}
-}
-
-//은행의 재정의된 Excute 
-void VisitBankAndDepositGold::Excute(Miner* pMiner)
-{
-	//광산에서 캔 금덩이만큼 저축금액 증가
-	pMiner->AddToWealth(pMiner->GoldCarried());
-	//저축 하였으니 광부가 광산에서 캔 금덩이 초기화
-	pMiner->SetGoldCarried(0);
-
-	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-	std::cout << GetNameOfEntity(pMiner->ID()) << ":금덩이 저금\n\n현재 잔금:" << pMiner->Wealth() << std::endl << std::endl;
-
-	// 저축 금액을 확인,
-	if (pMiner->Wealth() >= COMFORT_LEVEL)
-	{
-		// 만족할 만큼 돈을 모았다.
-		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":\"우와! 이제 나는 부자다. 집에 있는 아내에게로 돌아가지.\"" << std::endl;
-		//집으로 상태전환
-		pMiner->ChangeState(GoHomeAndSleepTilRested::Instance());
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":유익한 내용이였어!" << std::endl;
 	}
 	else
 	{
-		// 아직 돈이 부족하다. 다시 광산으로.
-		pMiner->ChangeState(EnterMineAndDigForNugget::Instance());
+		//졸았으니 컨디션 감소는 없고 지식 증가도 x
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":zzzzzz..." << std::endl;
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":이런!! 깜빡 졸아버렸다! ㅜㅜ" << std::endl;
 	}
+	
+	//수업이 끝났으니 쉬는 시간 상태로
+	pMiner->ChangeState(BreakTime::Instance());
 }
 
-void VisitBankAndDepositGold::Exit(Miner* pMiner)
+void Study::Exit(Miner* pMiner)
 {
 	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-	std::cout << GetNameOfEntity(pMiner->ID()) << ":은행을 떠난다" << std::endl;
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":수업이 드디어 끝났다..!" << std::endl;
 }
 // -------------------------------------------------------------
 
-// GoHomeAndSleepTilRested -------------------------------------
-GoHomeAndSleepTilRested* GoHomeAndSleepTilRested::Instance()
+// 쉬는 시간 ------------------------------------
+BreakTime* BreakTime::Instance()
 {
-	static GoHomeAndSleepTilRested instance;
+	static BreakTime instance;
 	return &instance;
 }
 
-void GoHomeAndSleepTilRested::Enter(Miner* pMiner)
+void BreakTime::Enter(Miner* pMiner)
 {
-	//위치가 집이 아니면 집으로 상태전환
-	if (pMiner->Location() != Location_Type::shack)
-	{
-		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":집으로 들어간다" << std::endl;
-
-		pMiner->ChangeLocation(Location_Type::shack);
-	}
-}
-
-void GoHomeAndSleepTilRested::Excute(Miner* pMiner)
-{
-	// 피로도를 확인.
-	if (!pMiner->Fatigued())
-	{
-		// 피로가 다 필리면 다시 금을 캐러같다.
-		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":\"낮잠을 늘어지게 잤네! 다시 금을 캐러 가야겠군.\"" << std::endl;
-		//광산으로
-		pMiner->ChangeState(EnterMineAndDigForNugget::Instance());
-	}
-	else
-	{
-		// 피곤하니 잠을 잔다. 1씩 줄어드네
-		pMiner->DecreaseFatigue();
-
-		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":...zZ" << std::endl;
-	}
-}
-
-void GoHomeAndSleepTilRested::Exit(Miner* pMiner)
-{
+	//1교시 끝났으니 시간(교시) Count 증가
+	pMiner->IncreaseHourCount();
 	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-	std::cout << GetNameOfEntity(pMiner->ID()) << ":집을 떠난다" << std::endl;
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":쉬는 시간이다!!" << std::endl;
+}
+
+//쉬는 시간의 재정의된 Excute 
+void BreakTime::Excute(Miner* pMiner)
+{
+	
+	//점심시간(4)라면 점심시간 상태로 변경
+	if (pMiner->GetHourCount() == LUNCH_TIME)
+	{
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":드디어 점심 시간이다!!" << std::endl;
+		//점심시간으로 상태 변경
+		pMiner->ChangeState(LunchTime::Instance());
+	}
+
+	//방과후(8)시간이라면 집으로
+	else if(pMiner->GetHourCount() >= AFTER_SCHOOL)
+	{
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":드디어 집갈 시간이다!" << std::endl;
+		//점심시간으로 상태 변경
+		pMiner->ChangeState(Home::Instance());
+	}
+	//랜덤의 숫자로 컨디션 증가. 1에서 3? 
+    int rand_condition = (rand() % 3) + 1;
+	//랜덤확률로 수업상태 or 쪽지 시험 상태로 ( 9:1로 )
+	int rand_test = (rand() % 100) + 1;
+
+	//10 이상이면 수업 아니면 쪽지시험
+	if (rand_test > 10)
+	{
+		//1~3만큼 컨디션 증가
+		pMiner->SetCondition(rand_condition);
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":다시 화이팅 해보자!!" << std::endl;
+		// 수업 시간으로
+		pMiner->ChangeState(Study::Instance());
+	}
+	else {
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":으아아.. 쪽지 시험이다.." << std::endl;
+		// 쪽지 시험으로
+		pMiner->ChangeState(PaperTest::Instance());
+	}
+}
+
+void BreakTime::Exit(Miner* pMiner)
+{
+	//SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	//std::cout << GetNameOfEntity(pMiner->ID()) << ":은행을 떠난다" << std::endl;
 }
 // -------------------------------------------------------------
 
-// QuenchThirst ------------------------------------------------
-QuenchThirst* QuenchThirst::Instance()
+// 점심 시간 -------------------------------------
+LunchTime* LunchTime::Instance()
 {
-	static QuenchThirst instance;
+	static LunchTime instance;
 	return &instance;
 }
 
-void QuenchThirst::Enter(Miner* pMiner)
+void LunchTime::Enter(Miner* pMiner)
 {
-	if (pMiner->Location() != Location_Type::saloon)
-	{
-		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":\"목이 마르군!\"" << std::endl;
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":술집으로 들어간다" << std::endl;
-
-		pMiner->ChangeLocation(Location_Type::saloon);
-	}
+	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":배부르게 먹어보자 ㅎㅎ" << std::endl;
 }
 
-void QuenchThirst::Excute(Miner* pMiner)
+void LunchTime::Excute(Miner* pMiner)
 {
-	// 갈증이 있다면,
-	if (pMiner->Thirsty())
+	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":너무 맛있다 ㅎㅎ!" << std::endl;
+	//컨디션 회복
+	pMiner->IncreaseCondition();
+	//다시 수업시간으로
+	pMiner->ChangeState(Study::Instance());
+}
+
+void LunchTime::Exit(Miner* pMiner)
+{
+	//SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	//std::cout << GetNameOfEntity(pMiner->ID()) << ":집을 떠난다" << std::endl;
+}
+// -------------------------------------------------------------
+
+// 쪽지 시험 ------------------------------------------------
+PaperTest* PaperTest::Instance()
+{
+	static PaperTest instance;
+	return &instance;
+}
+
+void PaperTest::Enter(Miner* pMiner)
+{
+	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":긴장된다!" << std::endl;
+}
+
+void PaperTest::Excute(Miner* pMiner)
+{
+	if (pMiner->GetKnowledge() >= 5)
 	{
-		// 목이 마르니 술을 마시자.
-		//갈증0으로 초기화, 현재 금액 -2
-		pMiner->BuyAndDrinkAWhiskey();
-
 		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << GetNameOfEntity(pMiner->ID()) << ":술을 마신다" << std::endl;
-
-		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << "\n현재 잔금:" << pMiner->Wealth() << std::endl << std::endl;
-		//광산에서 목이마를때 술집 들렀다가 갈증 해소하고 다시 광산으로 출근
-		pMiner->ChangeState(EnterMineAndDigForNugget::Instance());
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":A를 받았네!" << std::endl;
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":열심히 수업 들은 보람이 있었어 ㅎㅎ" << std::endl;
+		pMiner->IncreaseCondition();
 	}
 	else
 	{
 		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-		std::cout << "\nError!\nError!!\nError!!!" << std::endl;
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":성적이 엉망이네.." << std::endl;
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":수업을 더 열심히 들어야겠어" << std::endl;
 	}
+
+	pMiner->ChangeState(BreakTime::Instance());
 }
 
-void QuenchThirst::Exit(Miner* pMiner)
+void PaperTest::Exit(Miner* pMiner)
 {
-	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-	std::cout << GetNameOfEntity(pMiner->ID()) << ":술집을 떠난다" << std::endl;
+	//SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	//std::cout << GetNameOfEntity(pMiner->ID()) << ":술집을 떠난다" << std::endl;
 }
 // -------------------------------------------------------------
+// 무단결(도망)
+Truancy* Truancy::Instance()
+{
+	static Truancy instance;
+	return &instance;
+}
+
+void Truancy::Enter(Miner* pMiner)
+{
+	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":오늘은 꼭 승급하고 말거야!" << std::endl;
+}
+
+void Truancy::Excute(Miner* pMiner)
+{
+	//붙잡힐 확률
+	int rand_caught = (rand() % 100) + 1;
+
+	//잡힐 확률 30 안걸릴 확률 70
+	if (rand_caught > 30)
+	{
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":정말 재밌다!!" << std::endl;
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":즐겼으니 걸리기 전에 돌아가보실까" << std::endl;
+		pMiner->IncreaseCondition();
+	}
+	else
+	{
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << GetNameOfEntity(pMiner->ID()) << ":선생님에게 잡히고 말았네.." << std::endl;
+		pMiner->DecreaseCondition();
+	}
+
+	pMiner->ChangeState(BreakTime::Instance());
+}
+
+void Truancy::Exit(Miner* pMiner)
+{
+	//SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	//std::cout << GetNameOfEntity(pMiner->ID()) << ":술집을 떠난다" << std::endl;
+}
+
+// 집 ------------------------------------------------
+Home* Home::Instance()
+{
+	static Home instance;
+	return &instance;
+}
+
+void Home::Enter(Miner* pMiner)
+{
+	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":드디어 집 도착했다! ㅜㅜ" << std::endl;
+}
+
+void Home::Excute(Miner* pMiner)
+{
+	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":고생했으니 내일을 위해 푹 쉬자" << std::endl;
+	std::cout << GetNameOfEntity(pMiner->ID()) << ":zzzzzz.." << std::endl;
+	pMiner->IncreaseCondition();
+	pMiner->SetCondition(0);
+	pMiner->SetKnowledge(0);
+	//다음날 되었으니 다시 학교로
+	pMiner->ChangeState(Study::Instance());
+}
+
+void Home::Exit(Miner* pMiner)
+{
+	//SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	//std::cout << GetNameOfEntity(pMiner->ID()) << ":술집을 떠난다" << std::endl;
+}

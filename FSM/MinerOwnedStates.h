@@ -2,61 +2,97 @@
 #include "Miner.h"
 
 
-class EnterMineAndDigForNugget : public State
+//수업을 듣는 상태
+class Study : public State
 {
 private:
-	EnterMineAndDigForNugget() {}
-	EnterMineAndDigForNugget(const EnterMineAndDigForNugget&);
-	EnterMineAndDigForNugget& operator=(const EnterMineAndDigForNugget&);
+	Study() {}
+	Study(const Study&);
+	Study& operator=(const Study&);
 
 public:
 	//싱글톤
-	static EnterMineAndDigForNugget* Instance();
+	static Study* Instance();
 
 	virtual void Enter(Miner*);
 	virtual void Excute(Miner*);
 	virtual void Exit(Miner*);
 };
 
-class VisitBankAndDepositGold : public State
+//쉬는 시간 상태
+class BreakTime : public State
 {
 private:
-	VisitBankAndDepositGold() {}
-	VisitBankAndDepositGold(const VisitBankAndDepositGold&);
-	VisitBankAndDepositGold& operator=(const VisitBankAndDepositGold&);
+	BreakTime() {}
+	BreakTime(const BreakTime&);
+	BreakTime& operator=(const BreakTime&);
 
 public:
-	static VisitBankAndDepositGold* Instance();
+	static BreakTime* Instance();
 
 	virtual void Enter(Miner*);
 	virtual void Excute(Miner*);
 	virtual void Exit(Miner*);
 };
 
-class GoHomeAndSleepTilRested : public State
+//점심 시간 상태
+class LunchTime : public State
 {
 private:
-	GoHomeAndSleepTilRested() {}
-	GoHomeAndSleepTilRested(const GoHomeAndSleepTilRested&);
-	GoHomeAndSleepTilRested& operator=(const GoHomeAndSleepTilRested&);
+	LunchTime() {}
+	LunchTime(const LunchTime&);
+	LunchTime& operator=(const LunchTime&);
 
 public:
-	static GoHomeAndSleepTilRested* Instance();
+	static LunchTime* Instance();
 
 	virtual void Enter(Miner*);
 	virtual void Excute(Miner*);
 	virtual void Exit(Miner*);
 };
 
-class QuenchThirst : public State
+//쪽지 시험 상태 
+class PaperTest : public State
 {
 private:
-	QuenchThirst() {}
-	QuenchThirst(const QuenchThirst&);
-	QuenchThirst& operator=(const QuenchThirst&);
+	PaperTest() {}
+	PaperTest(const PaperTest&);
+	PaperTest& operator=(const PaperTest&);
 
 public:
-	static QuenchThirst* Instance();
+	static PaperTest* Instance();
+
+	virtual void Enter(Miner*);
+	virtual void Excute(Miner*);
+	virtual void Exit(Miner*);
+};
+
+//무단결(수업 째고 도망)
+class Truancy : public State
+{
+private:
+	Truancy() {}
+	Truancy(const Truancy&);
+	Truancy& operator=(const Truancy&);
+
+public:
+	static Truancy* Instance();
+
+	virtual void Enter(Miner*);
+	virtual void Excute(Miner*);
+	virtual void Exit(Miner*);
+};
+
+//집 상태
+class Home : public State
+{
+private:
+	Home() {}
+	Home(const Home&);
+	Home& operator=(const Home&);
+
+public:
+	static Home* Instance();
 
 	virtual void Enter(Miner*);
 	virtual void Excute(Miner*);
