@@ -7,19 +7,16 @@
 Miner::Miner(const int& id) :
 	BaseGameEntity(id),
 	//m_Location(Location_Type::shack),
-	m_Condition(0),
+	m_Condition(2),
 	m_Knowledge(0),
-	m_HourCount(0),
+	m_HourCount(1),
 	m_pCurrState(Home::Instance()) {
 	srand((unsigned int)time(0));
 }
 
 void Miner::Update()
 {
-	//갈증도 + 1
-	//m_nThirst += 1;
-
-	//상태가 nullptr이 아닐때 상태 변경?
+	//상태가 nullptr이 아닐때 상태 변경
 	if (m_pCurrState)
 	{
 		m_pCurrState->Excute(this);

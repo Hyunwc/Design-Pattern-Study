@@ -6,9 +6,10 @@
 #define MAX_NUGGETS			3	// 최대 소지금.
 #define THIRST_LEVEL		5	// 갈증 한계.
 #define TIREDNESS_THRESHOLD	5	// 피로 한계.
-#define MAX_CONDITION       10   // 최상의 컨디션.
+//#define MAX_CONDITION       10  // 최상의 컨디션.
+#define NORMAL_CONDITION    5   //보통 컨디션.
 #define BAD_CONDITION       2   // 좋지않은 컨디션.
-#define LUNCH_TIME          4   // 점심 시간.
+#define LUNCH_TIME          5   // 점심 시간.
 #define AFTER_SCHOOL        8   //방과후
  
 class Miner;
@@ -53,7 +54,7 @@ public:
 	//bool PocketsFull() const { return (MAX_NUGGETS <= m_nGoldCarried); }
 
 	bool Fatigued() const;
-	void DecreaseCondition() { m_Condition--; }
+	void DecreaseCondition(const int& value) { m_Condition -= value; }
 	void IncreaseCondition() { m_Condition++; }
 	void IncreaseHourCount() { m_HourCount++; }
 	void IncreaseKnowledge() { m_Knowledge++; }
