@@ -7,7 +7,6 @@ BitMapManager::BitMapManager()
 	m_parrBitMap = new BitMap[IMAGE_END];
 }
 
-
 void BitMapManager::Init(HWND hWnd)
 {
 	char buf[256];
@@ -18,6 +17,7 @@ void BitMapManager::Init(HWND hWnd)
 		//DC와 이미지 경로를
 		m_parrBitMap[i].Init(hdc,buf);
 	}
+
 	ReleaseDC(hWnd, hdc);
 }
 

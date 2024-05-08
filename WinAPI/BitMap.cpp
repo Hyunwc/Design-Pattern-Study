@@ -14,6 +14,7 @@ void BitMap::Init(HDC hdc,char* FileName)
 	//붓에 잉크를 찍는.
 	SelectObject(MemDC, m_BitMap);
 	BITMAP BitMap_Info;
+	//해당오브젝트의 핸들을 넘겨주고 정보를 받아옴 여기선 비트맵을
 	GetObject(m_BitMap, sizeof(BitMap_Info), &BitMap_Info);
 	m_Size.cx = BitMap_Info.bmWidth;
 	m_Size.cy = BitMap_Info.bmHeight;

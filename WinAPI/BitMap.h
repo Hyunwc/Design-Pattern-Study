@@ -6,7 +6,7 @@ class BitMap
 {
 private:
 	HDC MemDC;
-	HBITMAP m_BitMap;
+	HBITMAP m_BitMap; 
 	SIZE m_Size;
 public:
 	void Init(HDC hdc,char* FileName);
