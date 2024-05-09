@@ -9,10 +9,11 @@ private:
 	static GameManager* instance;
 	BitMap m_bitmap;
 	Card m_card;
+	HWND hWnd;
 	
 	GameManager(){}
 public:
-	~GameManager(){}
+	~GameManager();
 	static GameManager* Instance()
 	{
 		if (nullptr == instance) instance == new GameManager;
