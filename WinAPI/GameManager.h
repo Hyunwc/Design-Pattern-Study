@@ -1,26 +1,26 @@
 #pragma once
-#include "BitMap.h"
-#include "BitMapManager.h"
+//#include "BitMap.h"
+//#include "BitMapManager.h"
 #include "Card.h"
 
 class GameManager
 {
 private:
-	static GameManager* instance;
-	BitMap m_bitmap;
 	Card m_card;
-	HWND hWnd;
-	
-	GameManager(){}
+	HWND m_hWnd;
+	static GameManager* instance;
+	GameManager() {}
 public:
 	~GameManager();
 	static GameManager* Instance()
 	{
-		if (nullptr == instance) instance == new GameManager;
+		if (instance == nullptr) instance = new GameManager;
 		return instance;
 	}
 	static void Release()
 	{
+		//게임매니저에서 비트맵 매니저 관리하니 게임매니저에서 비트맵 매니저 해제
+		BitMapManager::Release();
 		if (instance)
 		{
 			delete instance;
@@ -28,8 +28,7 @@ public:
 		}
 	}
 
-	void Init(); //초기화
-	void Menu(); //메인메뉴
+	void Init(HWND hWnd); //초기화
+	
 };
 
-GameManager* GameManager::instance = nullptr;

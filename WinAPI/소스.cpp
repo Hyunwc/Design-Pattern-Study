@@ -2,10 +2,12 @@
 #include<string.h>
 #include<stdlib.h>
 #include<stdio.h>
-#include"Card.h"
+//#include"Card.h"
+#include "GameManager.h"
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 HINSTANCE g_hInst;
 LPCTSTR lpszClass = TEXT("CardGame");
+
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmdParam, int nCmdShow)
 {
@@ -44,14 +46,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
 	PAINTSTRUCT ps;
-	static Card card;
+	
 	POINT Point;
+	
 	switch (iMessage)
 	{
 	case WM_CREATE:
 		//비트맵 배열에 이미지 경로 넣는 작업 수행
-		BitMapManager::GetInstance()->Init(hWnd);
-		card.Init(IMAGE_CHICKEN, 100, 50);
+		GameManager::Instance()->Init(hWnd);
 		return 0;
 	//좌클릭 했을때 
 	case WM_LBUTTONDOWN:
@@ -61,19 +63,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Point.x = LOWORD(lParam);
 		Point.y = HIWORD(lParam);
 		//화면 전체를 지우고 새로 그림
-		if (card.ColliderCheck(Point))
-			InvalidateRect(hWnd, NULL, true);
+		/*if (card.ColliderCheck(Point))
+			InvalidateRect(hWnd, NULL, true);*/
 		return 0;
 	case WM_PAINT:
+		//이작업들은 여기서만 수행되어야함.
 		hdc = BeginPaint(hWnd, &ps);
-		//카드 그리는 작업을 수행
-		card.Draw(hdc);
+
+		//Rectangle함수 이용(hdc, left, top, right, bottom까지 4개의 매개변수)
+		//left 사각형 왼쪽 x right 사각형 오른쪽 x 
+		Rectangle(hdc, 300, 350 ,500, 400);
+		Rectangle(hdc, 300, 450, 500, 500);
+		//이 함수에서 현재 화면이 시작화면인지, 게임화면인지, 엔딩인지
+		//GameManager::Instance()->Draw(hdc);
+
 		EndPaint(hWnd, &ps);
 		return 0;
 	case WM_DESTROY:
 		//싱글톤 해제
 		//delete BitMapManager::GetInstance();
-		BitMapManager::Release();
+		GameManager::Release();
 		PostQuitMessage(0);
 		return 0;
 	}
