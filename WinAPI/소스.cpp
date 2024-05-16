@@ -2,6 +2,7 @@
 #include<string.h>
 #include<stdlib.h>
 #include<stdio.h>
+#include <iostream>
 //#include"Card.h"
 #include "GameManager.h"
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -58,24 +59,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	//좌클릭 했을때 
 	case WM_LBUTTONDOWN:
 		//이곳에서 Start클릭햇을때 
-
 		//클릭한 곳의 좌표를 card의 충돌검사 함수로 넘겨줌
 		Point.x = LOWORD(lParam);
 		Point.y = HIWORD(lParam);
+		//GameManager::Instance()->CheckCollide(Point);
 		//화면 전체를 지우고 새로 그림
-		/*if (card.ColliderCheck(Point))
-			InvalidateRect(hWnd, NULL, true);*/
+		if (GameManager::Instance()->CheckCollide(Point))
+		{
+
+		}
 		return 0;
 	case WM_PAINT:
 		//이작업들은 여기서만 수행되어야함.
 		hdc = BeginPaint(hWnd, &ps);
 
-		//Rectangle함수 이용(hdc, left, top, right, bottom까지 4개의 매개변수)
-		//left 사각형 왼쪽 x right 사각형 오른쪽 x 
-		Rectangle(hdc, 300, 350 ,500, 400);
-		Rectangle(hdc, 300, 450, 500, 500);
 		//이 함수에서 현재 화면이 시작화면인지, 게임화면인지, 엔딩인지
-		//GameManager::Instance()->Draw(hdc);
+		GameManager::Instance()->Draw(hdc);
 
 		EndPaint(hWnd, &ps);
 		return 0;

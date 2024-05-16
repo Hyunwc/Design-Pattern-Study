@@ -3,11 +3,20 @@
 //#include "BitMapManager.h"
 #include "Card.h"
 
+enum GameState
+{
+	MainMenu,
+	GamePlay,
+	GameOver
+};
+
 class GameManager
 {
 private:
 	Card m_card;
 	HWND m_hWnd;
+	GameState m_state;
+	RECT testrect;
 	static GameManager* instance;
 	GameManager() {}
 public:
@@ -29,6 +38,8 @@ public:
 	}
 
 	void Init(HWND hWnd); //√ ±‚»≠
+	void Draw(HDC hdc); 
+	bool CheckCollide(POINT point);
 	
 };
 
