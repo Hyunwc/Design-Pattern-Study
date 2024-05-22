@@ -2,6 +2,9 @@
 //#include "BitMap.h"
 //#include "BitMapManager.h"
 #include "Card.h"
+#include <vector>
+#include <ctime>
+#include <algorithm>
 
 enum GameState
 {
@@ -13,12 +16,15 @@ enum GameState
 class GameManager
 {
 private:
-	Card m_card;
+	vector<Card> m_cards;
 	HWND m_hWnd;
 	GameState m_state;
-	RECT testrect;
+	RECT startRect, endRect;
+	POINT firstClick; 
+	POINT secondClick;
+	bool cardFlipping;
 	static GameManager* instance;
-	GameManager() {}
+	GameManager() : cardFlipping(false) {}
 public:
 	~GameManager();
 	static GameManager* Instance()

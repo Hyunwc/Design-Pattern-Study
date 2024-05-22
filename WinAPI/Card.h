@@ -16,11 +16,16 @@ private:
 	int m_ix;
 	int m_iy;
 	RECT m_BitMapRect;
+	IMAGE m_ImageIndex;
 public:
 	Card();
 	void Init(IMAGE Index, int x, int y);
 	void Draw(HDC hdc);
 	bool ColliderCheck(POINT point);
+	IMAGE GetImageIndex();
+	void Flip();
+	void SetState(CARD state);
+	CARD GetState();
 	~Card();
 };
 

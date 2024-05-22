@@ -66,7 +66,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//화면 전체를 지우고 새로 그림
 		if (GameManager::Instance()->CheckCollide(Point))
 		{
-
+			InvalidateRect(hWnd, NULL, TRUE);
+			//GameManager::Instance()->SetCheckBool(true);
 		}
 		return 0;
 	case WM_PAINT:

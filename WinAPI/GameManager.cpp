@@ -10,10 +10,51 @@ void GameManager::Init(HWND hWnd)
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_state = MainMenu;
 	//테스트용 렉트 영역(나중에 수정 할 예정)
-	testrect.left = 300;
-	testrect.top = 350;
-	testrect.right = 500;
-	testrect.bottom = 400;
+	startRect.left = 300;
+	startRect.top = 350;
+	startRect.right = 500;
+	startRect.bottom = 400;
+
+	endRect.left = 300;
+	endRect.top = 450;
+	endRect.right = 500;
+	endRect.bottom = 500;
+
+	// 카드 간격과 크기 정의
+	const int CARD_WIDTH = 100;
+	const int CARD_HEIGHT = 150;
+	const int X_SPACING = 10;
+	const int Y_SPACING = 10;
+
+	// 첫 번째 카드의 위치
+	int xStart = 100;
+	int yStart = 100;
+
+	// 이미지 배열
+	vector<IMAGE> images;
+	for (int i = 0; i < 10; i++)
+	{
+		images.push_back(static_cast<IMAGE>(i));
+		images.push_back(static_cast<IMAGE>(i));
+	}
+	random_shuffle(images.begin(), images.end());
+
+	int index = 0;
+	// 4x5 카드 배치
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			Card card;
+			// 카드 위치 계산
+			int x = xStart + j * (CARD_WIDTH + X_SPACING);
+			int y = yStart + i * (CARD_HEIGHT + Y_SPACING);
+			card.Init(images[index], x, y);
+			m_cards.push_back(card);
+			
+			index++;
+		}
+	}
 }
 
 void GameManager::Draw(HDC hdc)
@@ -29,16 +70,28 @@ void GameManager::Draw(HDC hdc)
 	{
 		//left, top, right, bottom
 		Rectangle(hdc, 300, 350, 500, 400);
+		TextOut(hdc, 350, 365, TEXT("StartGame"), 10);
 		Rectangle(hdc, 300, 450, 500, 500);
+		TextOut(hdc, 350, 465, TEXT("EndGame"), 8);
+		break;
 	}
+	//게임 플레이
 	case GamePlay:
 	{
-
+		//벡터에 저장된 카드들 호출
+		for (auto& card : m_cards)
+		{
+			card.Draw(hdc);
+		}
+		break;
 	}
+	
 	case GameOver:
 	{
-
+		TextOut(hdc, 350, 365, TEXT("Game OVer"), 9);
+		break;
 	}
+	
 	default:
 		break;
 	}
@@ -47,16 +100,29 @@ void GameManager::Draw(HDC hdc)
 
 bool GameManager::CheckCollide(POINT point)
 {
-	//체크할 사각형의 영역과 x,y(대상의 위치)를 매개변수로.
-	if (PtInRect(&testrect, point))
+	if (m_state == MainMenu)
 	{
-		return true;
+		//체크할 사각형의 영역과 x,y(대상의 위치)를 매개변수로. (startRect영역)
+		if (PtInRect(&startRect, point))
+		{
+			//게임 플레이 상태로 변경
+			m_state = GamePlay;
+			
+			return true;
+		}
+		else if (PtInRect(&endRect, point))
+		{
+			m_state = GameOver;
+			return true;
+		}
 	}
+	else if (m_state == GamePlay)
+	{
+		
+	}
+	
 	return false;
 }
-
-
-
 
 GameManager::~GameManager()
 {
