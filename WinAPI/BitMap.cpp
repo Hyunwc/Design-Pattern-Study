@@ -23,7 +23,9 @@ void BitMap::Draw(HDC hdc, int x, int y)
 {
 	//크기 변경이 가능한 이미지.
 	//화면상 좌표, 화면상에 그려지는 너비 높이, 원본 이미지 xy좌표, 
-	StretchBlt(hdc, x, y, m_Size.cx / 2, m_Size.cy / 2, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
+	//StretchBlt(hdc, x, y, m_Size.cx / 2, m_Size.cy / 2, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
+	//테스트용
+	StretchBlt(hdc, x, y, 100, 150, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
 }
 
 BitMap::~BitMap()

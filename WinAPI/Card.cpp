@@ -11,11 +11,15 @@ Card::Card()
 
 void Card::Init(IMAGE Index, int x, int y)
 {
+	//ex 시작을 100 100으로 받는다면
 	m_ImageIndex = Index;
 	m_pBitMap[CARD_FRONT] = BitMapManager::GetInstance()->GetImage(Index);
 	m_pBitMap[CARD_REAR] = BitMapManager::GetInstance()->GetImage(IMAGE_BLACK);
-	m_ix = x; //500
-	m_iy = y; //200
+	// 그려질 영역 100 100으로
+	m_ix = x; 
+	m_iy = y;
+	//GetSize()로 받아오는 값 145 235
+	// 영역 left 100 top 100 right 245 335
 	m_BitMapRect.left = x; 
 	m_BitMapRect.top = y; 
 	m_BitMapRect.right = m_BitMapRect.left + m_pBitMap[CARD_FRONT]->GetSize().cx;
@@ -29,39 +33,27 @@ void Card::Draw(HDC hdc)
 //
 bool Card::ColliderCheck(POINT point)
 {
-	return PtInRect(&m_BitMapRect, point);
+	
 	//체크할 사각형의 영역과 x,y(대상의 위치)
-	//if (PtInRect(&m_BitMapRect, point))
-	//{
-	//	//충돌한 상태에서 카드가 앞면일때 뒷면으로
-	//	//반대인 상황에선 앞면으로
-	//	if (m_eCardState == CARD_FRONT)
-	//		m_eCardState = CARD_REAR;
-	//	else
-	//		m_eCardState = CARD_FRONT;
-	//	return true;
-	//}
-	//return false;
+	if (PtInRect(&m_BitMapRect, point))
+	{
+		//충돌한 상태에서 카드가 앞면일때 뒷면으로
+		//반대인 상황에선 앞면으로
+		if (m_eCardState == CARD_FRONT)
+			m_eCardState = CARD_REAR;
+		else
+			m_eCardState = CARD_FRONT;
+		return true;
+	}
+	return false;
 }
 
-IMAGE Card::GetImageIndex()
+void Card::SetState()
 {
-	return m_ImageIndex;
-}
-
-void Card::Flip()
-{
-	m_eCardState = (m_eCardState == CARD_FRONT) ? CARD_REAR : CARD_FRONT;
-}
-
-void Card::SetState(CARD state)
-{
-	m_eCardState = state;
-}
-
-CARD Card::GetState()
-{
-	return m_eCardState;
+	if (m_eCardState == CARD_FRONT)
+		m_eCardState = CARD_REAR;
+	else
+		m_eCardState = CARD_FRONT;
 }
 
 Card::~Card()

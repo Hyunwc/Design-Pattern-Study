@@ -37,23 +37,28 @@ void GameManager::Init(HWND hWnd)
 		images.push_back(static_cast<IMAGE>(i));
 		images.push_back(static_cast<IMAGE>(i));
 	}
+	//인덱스 셔플
 	random_shuffle(images.begin(), images.end());
 
 	int index = 0;
-	// 4x5 카드 배치
+	// 5x4 카드 배치
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 5; j++)
 		{
 			Card card;
 			// 카드 위치 계산
+			// (100,100) (210, 100) (320, 100) (430, 100) (540, 100)
+			
 			int x = xStart + j * (CARD_WIDTH + X_SPACING);
 			int y = yStart + i * (CARD_HEIGHT + Y_SPACING);
+			
+			//카드의 인덱스, 그려질 x, y좌표
 			card.Init(images[index], x, y);
 			m_cards.push_back(card);
-			
 			index++;
 		}
+		
 	}
 }
 
@@ -70,9 +75,10 @@ void GameManager::Draw(HDC hdc)
 	{
 		//left, top, right, bottom
 		Rectangle(hdc, 300, 350, 500, 400);
-		TextOut(hdc, 350, 365, TEXT("StartGame"), 10);
+		//맨 뒤에 파라미터는 문자열의 길이
+		TextOut(hdc, 350, 365, TEXT("StartGame"), 9);
 		Rectangle(hdc, 300, 450, 500, 500);
-		TextOut(hdc, 350, 465, TEXT("EndGame"), 8);
+		TextOut(hdc, 350, 465, TEXT("EndGame"), 7);
 		break;
 	}
 	//게임 플레이
@@ -88,7 +94,7 @@ void GameManager::Draw(HDC hdc)
 	
 	case GameOver:
 	{
-		TextOut(hdc, 350, 365, TEXT("Game OVer"), 9);
+		TextOut(hdc, 350, 365, TEXT("Game Over"), 9);
 		break;
 	}
 	
@@ -98,8 +104,10 @@ void GameManager::Draw(HDC hdc)
 
 }
 
+//매개변수 : 클릭한 곳의 x,y좌표를 받아옴
 bool GameManager::CheckCollide(POINT point)
 {
+	//메인메뉴
 	if (m_state == MainMenu)
 	{
 		//체크할 사각형의 영역과 x,y(대상의 위치)를 매개변수로. (startRect영역)
@@ -116,9 +124,16 @@ bool GameManager::CheckCollide(POINT point)
 			return true;
 		}
 	}
+	//게임중 일때
 	else if (m_state == GamePlay)
 	{
-		
+		//체크할 사각형의 영역(카드의 영역)과, 대상의 위치.
+		//조건과 일치할시 카드의 상태를 바꿔야함.
+		if (PtInRect(m_cards[0].GetBitMapRect(), point))
+		{
+			m_cards[0].SetState();
+			return true;
+		}
 	}
 	
 	return false;

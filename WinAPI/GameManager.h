@@ -20,11 +20,8 @@ private:
 	HWND m_hWnd;
 	GameState m_state;
 	RECT startRect, endRect;
-	POINT firstClick; 
-	POINT secondClick;
-	bool cardFlipping;
 	static GameManager* instance;
-	GameManager() : cardFlipping(false) {}
+	GameManager() {}
 public:
 	~GameManager();
 	static GameManager* Instance()

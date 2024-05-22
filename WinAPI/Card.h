@@ -22,10 +22,10 @@ public:
 	void Init(IMAGE Index, int x, int y);
 	void Draw(HDC hdc);
 	bool ColliderCheck(POINT point);
-	IMAGE GetImageIndex();
-	void Flip();
-	void SetState(CARD state);
-	CARD GetState();
+	RECT* GetBitMapRect() { return &m_BitMapRect; } //영역 반환
+	IMAGE GetIndex() { return m_ImageIndex; }
+	void SetState(); //상태 변경
+	
 	~Card();
 };
 
