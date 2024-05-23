@@ -87,7 +87,7 @@ void GameManager::Draw(HDC hdc)
 	//게임 플레이
 	case GamePlay:
 	{
-		//벡터에 저장된 카드들 호출
+		//벡터에 저장된 카드들 Draw() 호출
 		for (auto& card : m_cards)
 		{
 			card.Draw(hdc);
@@ -109,8 +109,10 @@ void GameManager::Draw(HDC hdc)
 
 }
 
-void GameManager::CardCheck()
+//충돌 체크가 되어 들어오게되는 함수
+void GameManager::CardCheck(CARD first, CARD second)
 {
+
 }
 
 //매개변수 : 클릭한 곳의 x,y좌표를 받아옴
@@ -142,8 +144,30 @@ bool GameManager::CheckCollide(POINT point)
 		{
 			if (PtInRect(card.GetBitMapRect(), point))
 			{
-				card.SetState();
-				return true;
+				//해당 영역의 상태가 End면 false 반환
+				if (card.GetState() == CARD_END)
+					return false;
+
+				//뒤집기 카운트 1일시 첫번째 enum값 받아오고
+				//State에 false를 보낸다.false일시 앞 뒤 뒤집기만.
+				if (rev_count == 1)
+				{
+					firstEnum = card.GetIndex();
+					card.SetState(false);
+					return true;
+				}
+				else if (rev_count == 2)
+				{
+					secondEnum = card.GetIndex();
+					//처음과 두번째의 enum값이 같으면 true를 보내주어 end상태로 만든다.
+					if (firstEnum == secondEnum)
+						card.SetState(true);
+					else
+						card.SetState(false);
+
+					rev_count = 0;
+					return true;
+				}
 			}
 		}
 		

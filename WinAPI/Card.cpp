@@ -41,6 +41,7 @@ bool Card::ColliderCheck(POINT point)
 	{
 		//충돌한 상태에서 카드가 앞면일때 뒷면으로
 		//반대인 상황에선 앞면으로
+		//
 		if (m_eCardState == CARD_FRONT)
 			m_eCardState = CARD_REAR;
 		else
@@ -50,12 +51,14 @@ bool Card::ColliderCheck(POINT point)
 	return false;
 }
 
-void Card::SetState()
+void Card::SetState(bool success)
 {
-	if (m_eCardState == CARD_FRONT)
-		m_eCardState = CARD_REAR;
-	else
-		m_eCardState = CARD_FRONT;
+	//
+	if (success)
+		m_eCardState = CARD_END;
+	else 
+	    (m_eCardState == CARD_FRONT) ? m_eCardState = CARD_REAR : m_eCardState = CARD_FRONT;
+		
 }
 
 Card::~Card()

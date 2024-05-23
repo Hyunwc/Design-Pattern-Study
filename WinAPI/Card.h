@@ -24,7 +24,8 @@ public:
 	bool ColliderCheck(POINT point);
 	RECT* GetBitMapRect() { return &m_BitMapRect; } //영역 반환
 	IMAGE GetIndex() { return m_ImageIndex; }
-	void SetState(); //상태 변경
+	CARD GetState() { return m_eCardState; }
+	void SetState(bool success); //상태 변경
 	
 	~Card();
 };

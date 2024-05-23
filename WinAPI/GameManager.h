@@ -16,11 +16,14 @@ enum GameState
 class GameManager
 {
 private:
-	vector<Card> m_cards;
-	HWND m_hWnd;
-	GameState m_state;
-	RECT startRect, endRect;
+	vector<Card> m_cards; //카드를 담을 벡터
+	HWND m_hWnd; //핸들
+	GameState m_state; //현재 게임 상태
+	RECT startRect, endRect; //메인때 사용할 사각형 영역들
 	static GameManager* instance;
+	//잠시 테스트용으로 사용할 변수들 
+	IMAGE firstEnum, secondEnum; 
+	int rev_count = 0;
 	GameManager() {}
 public:
 	~GameManager();
@@ -42,7 +45,8 @@ public:
 
 	void Init(HWND hWnd); //초기화
 	void Draw(HDC hdc); 
-	void CardCheck();
+	void CardCheck(CARD first, CARD second);
+	void PlusCheckCount() { rev_count++; }
 	bool CheckCollide(POINT point);
 	
 };
