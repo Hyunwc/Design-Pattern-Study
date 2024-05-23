@@ -22,8 +22,10 @@ void Card::Init(IMAGE Index, int x, int y)
 	// ¿µ¿ª left 100 top 100 right 245 335
 	m_BitMapRect.left = x; 
 	m_BitMapRect.top = y; 
-	m_BitMapRect.right = m_BitMapRect.left + m_pBitMap[CARD_FRONT]->GetSize().cx;
-	m_BitMapRect.bottom = m_BitMapRect.top + m_pBitMap[CARD_FRONT]->GetSize().cy;
+	m_BitMapRect.right = m_BitMapRect.left + 100;
+	m_BitMapRect.bottom = m_BitMapRect.top + 150;
+	//m_BitMapRect.right = m_BitMapRect.left + m_pBitMap[CARD_FRONT]->GetSize().cx;
+	//m_BitMapRect.bottom = m_BitMapRect.top + m_pBitMap[CARD_FRONT]->GetSize().cy;
 }
 void Card::Draw(HDC hdc)
 {

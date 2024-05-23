@@ -42,6 +42,7 @@ public:
 
 	void Init(HWND hWnd); //√ ±‚»≠
 	void Draw(HDC hdc); 
+	void CardCheck();
 	bool CheckCollide(POINT point);
 	
 };

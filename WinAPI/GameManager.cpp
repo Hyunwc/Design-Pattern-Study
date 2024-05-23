@@ -32,8 +32,11 @@ void GameManager::Init(HWND hWnd)
 
 	// 이미지 배열
 	vector<IMAGE> images;
+	//IMAGE_DOG부터 시작해서 10개의 이미지를 추가.
+	//두 장씩 들어가야하니 두 번씩 추가.
 	for (int i = 0; i < 10; i++)
 	{
+		//정수형 값을 열거형 값으로 변환
 		images.push_back(static_cast<IMAGE>(i));
 		images.push_back(static_cast<IMAGE>(i));
 	}
@@ -89,6 +92,8 @@ void GameManager::Draw(HDC hdc)
 		{
 			card.Draw(hdc);
 		}
+
+		//카드를 그리고 나서 여기서 같은짝인지 체크를 하는 함수를 호출해야 할듯
 		break;
 	}
 	
@@ -102,6 +107,10 @@ void GameManager::Draw(HDC hdc)
 		break;
 	}
 
+}
+
+void GameManager::CardCheck()
+{
 }
 
 //매개변수 : 클릭한 곳의 x,y좌표를 받아옴
@@ -128,12 +137,16 @@ bool GameManager::CheckCollide(POINT point)
 	else if (m_state == GamePlay)
 	{
 		//체크할 사각형의 영역(카드의 영역)과, 대상의 위치.
-		//조건과 일치할시 카드의 상태를 바꿔야함.
-		if (PtInRect(m_cards[0].GetBitMapRect(), point))
+		//조건과 일치할시 카드의 상태를 바꿔야함
+		for (auto& card : m_cards)
 		{
-			m_cards[0].SetState();
-			return true;
+			if (PtInRect(card.GetBitMapRect(), point))
+			{
+				card.SetState();
+				return true;
+			}
 		}
+		
 	}
 	
 	return false;
