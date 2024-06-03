@@ -111,6 +111,7 @@ void GameManager::Draw(HDC hdc)
 
 }
 
+
 //매개변수 : 클릭한 곳의 x,y좌표를 받아옴
 bool GameManager::CheckCollide(POINT point)
 {
@@ -141,31 +142,17 @@ bool GameManager::CheckCollide(POINT point)
 			//클릭한 뒷면 카드 영역
 			if (card.ColliderCheck(point))
 			{
-				
 				//1일때 
 				if (rev_count == 1)
 				{
 					first = &card;
-				
 				}
 				//count가 2가 될시 second에 값을 넣고 first와 second를 비교한다
 				else if (rev_count == 2)
 				{
 					second = &card;
-					//이제 여기서 비교해서 둘이 같은 이미지가 아니라면
-					//
-					if (first->GetIndex() != second->GetIndex())
-					{
-						Sleep(2000);
-						first->ChangeRear();
-						second->ChangeRear();
-						
-					}
-					
-					first = nullptr;
-					second = nullptr;
-					rev_count = 0;
 				}
+
 				return true;
 			}
 		}
@@ -177,6 +164,24 @@ bool GameManager::CheckCollide(POINT point)
 
 	return false;
 }
+
+void GameManager::CardCheck()
+{
+	//InvalidateRect(m_hWnd, NULL, TRUE);
+	//첫카드와 둘째카드 비교해서 같지 않다면 둘다 뒷면으로변경
+	//같으면 그냥 냅두고 포인터와 횟수 초기화만 
+	
+	if (first->GetIndex() != second->GetIndex())
+	{
+		first->ChangeRear();
+		second->ChangeRear();
+	}	
+	
+	first = nullptr;
+	second = nullptr;
+	rev_count = 0;
+}
+
 
 GameManager::~GameManager()
 {

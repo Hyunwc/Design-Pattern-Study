@@ -55,6 +55,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		//비트맵 배열에 이미지 경로 넣는 작업 수행
 		GameManager::Instance()->Init(hWnd);
+		//핸들값, 타이머의 식별자, 1초, 타이머의 콜백함수
+		//Null이므로 WM_TIMER에 전달
+		//특정 함수를 설정하면 해당 함수에서 WM_TIMER를 처리
+		SetTimer(hWnd, 1, 1000, NULL);
 		return 0;
 	//좌클릭 했을때 
 	case WM_LBUTTONDOWN:
@@ -66,7 +70,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//화면 전체를 지우고 새로 그림
 		if (GameManager::Instance()->CheckCollide(Point))
 		{
-			//GameManager::Instance()->PlusCheckCount();
 			InvalidateRect(hWnd, NULL, TRUE);
 		}
 		return 0;
@@ -77,11 +80,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//이 함수에서 현재 화면이 시작화면인지, 게임화면인지, 엔딩인지
 		GameManager::Instance()->Draw(hdc);
 
+		if (GameManager::Instance()->GetRevCount() >= 2)
+		{
+			GameManager::Instance()->CardCheck();
+			InvalidateRect(hWnd, NULL, TRUE);
+		}
 		EndPaint(hWnd, &ps);
 		return 0;
+	case WM_TIMER:
+	{
+		break;
+	}
 	case WM_DESTROY:
 		//싱글톤 해제
 		//delete BitMapManager::GetInstance();
+		KillTimer(hWnd, 1);
 		GameManager::Release();
 		PostQuitMessage(0);
 		return 0;

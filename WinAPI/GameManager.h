@@ -47,8 +47,9 @@ public:
 
 	void Init(HWND hWnd); //√ ±‚»≠
 	void Draw(HDC hdc);
-	void PlusCheckCount() { rev_count++; }
+	int GetRevCount() { return rev_count; }
 	bool CheckCollide(POINT point);
+	void CardCheck();
 
 };
 
