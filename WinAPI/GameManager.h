@@ -5,6 +5,7 @@
 #include <vector>
 #include <ctime>
 #include <algorithm>
+#include <Windows.h>
 
 enum GameState
 {
@@ -22,7 +23,8 @@ private:
 	RECT startRect, endRect; //메인때 사용할 사각형 영역들
 	static GameManager* instance;
 	//잠시 테스트용으로 사용할 변수들 
-	IMAGE firstEnum, secondEnum; 
+	Card* first;
+	Card* second;
 	int rev_count = 0;
 	GameManager() {}
 public:
@@ -44,10 +46,9 @@ public:
 	}
 
 	void Init(HWND hWnd); //초기화
-	void Draw(HDC hdc); 
-	void CardCheck(CARD first, CARD second);
+	void Draw(HDC hdc);
 	void PlusCheckCount() { rev_count++; }
 	bool CheckCollide(POINT point);
-	
+
 };
 

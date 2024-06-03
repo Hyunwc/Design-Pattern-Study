@@ -6,6 +6,8 @@ void GameManager::Init(HWND hWnd)
 {
 	//Main에서 보낼 예정
 	m_hWnd = hWnd;
+	first = nullptr;
+	second = nullptr;
 	//비트맵 배열에 이미지 경로 넣는 작업.
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_state = MainMenu;
@@ -52,16 +54,16 @@ void GameManager::Init(HWND hWnd)
 			Card card;
 			// 카드 위치 계산
 			// (100,100) (210, 100) (320, 100) (430, 100) (540, 100)
-			
+
 			int x = xStart + j * (CARD_WIDTH + X_SPACING);
 			int y = yStart + i * (CARD_HEIGHT + Y_SPACING);
-			
+
 			//카드의 인덱스, 그려질 x, y좌표
 			card.Init(images[index], x, y);
 			m_cards.push_back(card);
 			index++;
 		}
-		
+
 	}
 }
 
@@ -96,37 +98,32 @@ void GameManager::Draw(HDC hdc)
 		//카드를 그리고 나서 여기서 같은짝인지 체크를 하는 함수를 호출해야 할듯
 		break;
 	}
-	
+
 	case GameOver:
 	{
 		TextOut(hdc, 350, 365, TEXT("Game Over"), 9);
 		break;
 	}
-	
+
 	default:
 		break;
 	}
 
 }
 
-//충돌 체크가 되어 들어오게되는 함수
-void GameManager::CardCheck(CARD first, CARD second)
-{
-
-}
-
 //매개변수 : 클릭한 곳의 x,y좌표를 받아옴
 bool GameManager::CheckCollide(POINT point)
 {
-	//메인메뉴
-	if (m_state == MainMenu)
+	//m_state의 상태에 따라 
+	switch (m_state)
+	{
+	case MainMenu: //메인
 	{
 		//체크할 사각형의 영역과 x,y(대상의 위치)를 매개변수로. (startRect영역)
 		if (PtInRect(&startRect, point))
 		{
 			//게임 플레이 상태로 변경
 			m_state = GamePlay;
-			
 			return true;
 		}
 		else if (PtInRect(&endRect, point))
@@ -134,49 +131,54 @@ bool GameManager::CheckCollide(POINT point)
 			m_state = GameOver;
 			return true;
 		}
+		break;
 	}
-	//게임중 일때
-	else if (m_state == GamePlay)
+	case GamePlay: //게임중일때
 	{
-		//체크할 사각형의 영역(카드의 영역)과, 대상의 위치.
-		//조건과 일치할시 카드의 상태를 바꿔야함
+		rev_count++;
 		for (auto& card : m_cards)
 		{
-			if (PtInRect(card.GetBitMapRect(), point))
+			//클릭한 뒷면 카드 영역
+			if (card.ColliderCheck(point))
 			{
-				//해당 영역의 상태가 End면 false 반환
-				if (card.GetState() == CARD_END)
-					return false;
-
-				//뒤집기 카운트 1일시 첫번째 enum값 받아오고
-				//State에 false를 보낸다.false일시 앞 뒤 뒤집기만.
+				
+				//1일때 
 				if (rev_count == 1)
 				{
-					firstEnum = card.GetIndex();
-					card.SetState(false);
-					return true;
+					first = &card;
+				
 				}
+				//count가 2가 될시 second에 값을 넣고 first와 second를 비교한다
 				else if (rev_count == 2)
 				{
-					secondEnum = card.GetIndex();
-					//처음과 두번째의 enum값이 같으면 true를 보내주어 end상태로 만든다.
-					if (firstEnum == secondEnum)
-						card.SetState(true);
-					else
-						card.SetState(false);
-
+					second = &card;
+					//이제 여기서 비교해서 둘이 같은 이미지가 아니라면
+					//
+					if (first->GetIndex() != second->GetIndex())
+					{
+						Sleep(2000);
+						first->ChangeRear();
+						second->ChangeRear();
+						
+					}
+					
+					first = nullptr;
+					second = nullptr;
 					rev_count = 0;
-					return true;
 				}
+				return true;
 			}
 		}
-		
+		break;
 	}
-	
+	default:
+		break;
+	}
+
 	return false;
 }
 
 GameManager::~GameManager()
 {
-	
+
 }
