@@ -26,6 +26,7 @@ private:
 	Card* first;
 	Card* second;
 	int rev_count = 0;
+	bool checking;
 	GameManager() {}
 public:
 	~GameManager();
@@ -50,6 +51,7 @@ public:
 	int GetRevCount() { return rev_count; }
 	bool CheckCollide(POINT point);
 	void CardCheck();
-
+	void HandleTimer();
+	void SomeFunction();
 };
 

@@ -89,6 +89,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_TIMER:
 	{
+		if (wParam == 1)
+		{
+			GameManager::Instance()->HandleTimer();
+			//KillTimer(hWnd, 1);
+		}
 		break;
 	}
 	case WM_DESTROY:

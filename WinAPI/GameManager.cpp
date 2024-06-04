@@ -8,6 +8,7 @@ void GameManager::Init(HWND hWnd)
 	m_hWnd = hWnd;
 	first = nullptr;
 	second = nullptr;
+	checking = false;
 	//비트맵 배열에 이미지 경로 넣는 작업.
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_state = MainMenu;
@@ -136,12 +137,14 @@ bool GameManager::CheckCollide(POINT point)
 	}
 	case GamePlay: //게임중일때
 	{
-		rev_count++;
+		if (checking) return false; //카드 체크 중일때 false반환
+		
 		for (auto& card : m_cards)
 		{
 			//클릭한 뒷면 카드 영역
 			if (card.ColliderCheck(point))
 			{
+				rev_count++;
 				//1일때 
 				if (rev_count == 1)
 				{
@@ -151,6 +154,8 @@ bool GameManager::CheckCollide(POINT point)
 				else if (rev_count == 2)
 				{
 					second = &card;
+					checking = true;
+					SetTimer(m_hWnd, 1, 2000, NULL);
 				}
 
 				return true;
@@ -177,10 +182,23 @@ void GameManager::CardCheck()
 		second->ChangeRear();
 	}	
 	
-	first = nullptr;
-	second = nullptr;
+	//first = nullptr;
+	//second = nullptr;
 	rev_count = 0;
 }
+
+void GameManager::HandleTimer()
+{
+	//체킹이 트루일때
+	if (checking)
+	{
+		CardCheck(); //카드 검사
+		InvalidateRect(m_hWnd, NULL, TRUE);
+		checking = false;
+	}
+}
+
+
 
 
 GameManager::~GameManager()
