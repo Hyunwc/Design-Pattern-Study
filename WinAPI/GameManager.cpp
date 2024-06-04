@@ -8,7 +8,6 @@ void GameManager::Init(HWND hWnd)
 	m_hWnd = hWnd;
 	first = nullptr;
 	second = nullptr;
-	checking = false;
 	//비트맵 배열에 이미지 경로 넣는 작업.
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_state = MainMenu;
@@ -137,8 +136,10 @@ bool GameManager::CheckCollide(POINT point)
 	}
 	case GamePlay: //게임중일때
 	{
-		if (checking) return false; //카드 체크 중일때 false반환
-		
+		//체크 중일때는 false반환
+		if (checking)
+			return false;
+
 		for (auto& card : m_cards)
 		{
 			//클릭한 뒷면 카드 영역
@@ -155,7 +156,6 @@ bool GameManager::CheckCollide(POINT point)
 				{
 					second = &card;
 					checking = true;
-					SetTimer(m_hWnd, 1, 2000, NULL);
 				}
 
 				return true;
@@ -172,34 +172,51 @@ bool GameManager::CheckCollide(POINT point)
 
 void GameManager::CardCheck()
 {
-	//InvalidateRect(m_hWnd, NULL, TRUE);
 	//첫카드와 둘째카드 비교해서 같지 않다면 둘다 뒷면으로변경
 	//같으면 그냥 냅두고 포인터와 횟수 초기화만 
-	
 	if (first->GetIndex() != second->GetIndex())
 	{
+		SetTimer(m_hWnd, 1, 2000, NULL);
 		first->ChangeRear();
 		second->ChangeRear();
-	}	
-	
-	//first = nullptr;
-	//second = nullptr;
-	rev_count = 0;
-}
-
-void GameManager::HandleTimer()
-{
-	//체킹이 트루일때
-	if (checking)
+		rev_count = 0;
+		checking = false;
+	}
+	else
 	{
-		CardCheck(); //카드 검사
-		InvalidateRect(m_hWnd, NULL, TRUE);
+		rev_count = 0;
 		checking = false;
 	}
 }
 
 
 
+//테스트용
+//bool GameManager::CardCheck()
+//{
+//	//첫카드와 둘째카드 비교해서 같지 않다면 둘다 뒷면으로변경
+//	//같으면 그냥 냅두고 포인터와 횟수 초기화만 
+//	bool test = true;
+//	if (first->GetIndex() != second->GetIndex())
+//	{
+//		first->ChangeRear();
+//		second->ChangeRear();
+//		test = false;
+//	}
+//
+//	rev_count = 0;
+//	checking = false;
+//	return test;
+//}
+
+
+//void GameManager::DestroyTimer()
+//{
+//	KillTimer(m_hWnd, 1);
+//	first->ChangeRear();
+//	second->ChangeRear();
+//	InvalidateRect(m_hWnd, NULL, TRUE);
+//}
 
 GameManager::~GameManager()
 {

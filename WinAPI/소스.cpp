@@ -40,6 +40,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 		TranslateMessage(&Message);
 		DispatchMessage(&Message);
 	}
+
+	KillTimer(hWnd, 1);
 	return (int)Message.wParam;
 }
 
@@ -58,7 +60,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//핸들값, 타이머의 식별자, 1초, 타이머의 콜백함수
 		//Null이므로 WM_TIMER에 전달
 		//특정 함수를 설정하면 해당 함수에서 WM_TIMER를 처리
-		SetTimer(hWnd, 1, 1000, NULL);
 		return 0;
 	//좌클릭 했을때 
 	case WM_LBUTTONDOWN:
@@ -79,20 +80,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		//이 함수에서 현재 화면이 시작화면인지, 게임화면인지, 엔딩인지
 		GameManager::Instance()->Draw(hdc);
-
 		if (GameManager::Instance()->GetRevCount() >= 2)
 		{
 			GameManager::Instance()->CardCheck();
 			InvalidateRect(hWnd, NULL, TRUE);
 		}
+		
+
 		EndPaint(hWnd, &ps);
 		return 0;
 	case WM_TIMER:
 	{
+		//타이머의 ID
 		if (wParam == 1)
 		{
-			GameManager::Instance()->HandleTimer();
-			//KillTimer(hWnd, 1);
+			
+			
 		}
 		break;
 	}
