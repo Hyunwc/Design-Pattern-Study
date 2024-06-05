@@ -42,6 +42,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 	}
 
 	KillTimer(hWnd, 1);
+	KillTimer(hWnd, 2);
 	return (int)Message.wParam;
 }
 
@@ -80,13 +81,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		//이 함수에서 현재 화면이 시작화면인지, 게임화면인지, 엔딩인지
 		GameManager::Instance()->Draw(hdc);
-		if (GameManager::Instance()->GetRevCount() >= 2)
-		{
-			GameManager::Instance()->CardCheck();
-			InvalidateRect(hWnd, NULL, TRUE);
-		}
-		
-
 		EndPaint(hWnd, &ps);
 		return 0;
 	case WM_TIMER:
@@ -94,15 +88,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//타이머의 ID
 		if (wParam == 1)
 		{
-			
-			
+			GameManager::Instance()->DestroyTimer();
+			//InvalidateRect(hWnd, NULL, TRUE);
 		}
-		break;
+		else if (wParam == 2)
+		{
+			GameManager::Instance()->UpdateTimer();
+		}
+		return 0;
 	}
 	case WM_DESTROY:
 		//싱글톤 해제
 		//delete BitMapManager::GetInstance();
 		KillTimer(hWnd, 1);
+		KillTimer(hWnd, 2);
 		GameManager::Release();
 		PostQuitMessage(0);
 		return 0;

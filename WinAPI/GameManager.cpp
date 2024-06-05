@@ -8,6 +8,7 @@ void GameManager::Init(HWND hWnd)
 	m_hWnd = hWnd;
 	first = nullptr;
 	second = nullptr;
+	timelimit = 60;
 	//비트맵 배열에 이미지 경로 넣는 작업.
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_state = MainMenu;
@@ -65,6 +66,8 @@ void GameManager::Init(HWND hWnd)
 		}
 
 	}
+
+	SetTimer(m_hWnd, 2, 1000, NULL);
 }
 
 void GameManager::Draw(HDC hdc)
@@ -94,14 +97,19 @@ void GameManager::Draw(HDC hdc)
 		{
 			card.Draw(hdc);
 		}
-
+		char g_buf[256];
+		char c_buf[256];
+		sprintf_s(g_buf,  "%d : %d", 0, timelimit);
+		sprintf_s(c_buf,  "finish : %d", finish_count);
+		TextOutA(hdc, 350, 10, g_buf, strlen(g_buf));
+		TextOutA(hdc, 700, 10, c_buf, strlen(c_buf));
 		//카드를 그리고 나서 여기서 같은짝인지 체크를 하는 함수를 호출해야 할듯
 		break;
 	}
 
-	case GameOver:
+	case GameEnd:
 	{
-		TextOut(hdc, 350, 365, TEXT("Game Over"), 9);
+		TextOut(hdc, 10, 10, TEXT("Game Over"), 9);
 		break;
 	}
 
@@ -129,7 +137,7 @@ bool GameManager::CheckCollide(POINT point)
 		}
 		else if (PtInRect(&endRect, point))
 		{
-			m_state = GameOver;
+			m_state = GameEnd;
 			return true;
 		}
 		break;
@@ -156,6 +164,7 @@ bool GameManager::CheckCollide(POINT point)
 				{
 					second = &card;
 					checking = true;
+					CardCheck();
 				}
 
 				return true;
@@ -172,51 +181,56 @@ bool GameManager::CheckCollide(POINT point)
 
 void GameManager::CardCheck()
 {
+	if (finish_count == m_cards.size() / 2)
+	{
+		m_state = MainMenu;
+		system("pause");
+		InvalidateRect(m_hWnd, NULL, TRUE);
+		return;
+	}
 	//첫카드와 둘째카드 비교해서 같지 않다면 둘다 뒷면으로변경
 	//같으면 그냥 냅두고 포인터와 횟수 초기화만 
 	if (first->GetIndex() != second->GetIndex())
 	{
 		SetTimer(m_hWnd, 1, 2000, NULL);
-		first->ChangeRear();
-		second->ChangeRear();
-		rev_count = 0;
-		checking = false;
 	}
+	//같은 경우의 로직. 여기서 finish_count를 늘려보자
 	else
 	{
+		finish_count++;
 		rev_count = 0;
 		checking = false;
 	}
 }
 
+void GameManager::DestroyTimer()
+{
+	KillTimer(m_hWnd, 1);
+	first->ChangeRear();
+	second->ChangeRear();
+	rev_count = 0;
+	checking = false;
 
+	if (finish_count == m_cards.size() / 2)
+	{
+		m_state = MainMenu;
+	}
 
-//테스트용
-//bool GameManager::CardCheck()
-//{
-//	//첫카드와 둘째카드 비교해서 같지 않다면 둘다 뒷면으로변경
-//	//같으면 그냥 냅두고 포인터와 횟수 초기화만 
-//	bool test = true;
-//	if (first->GetIndex() != second->GetIndex())
-//	{
-//		first->ChangeRear();
-//		second->ChangeRear();
-//		test = false;
-//	}
-//
-//	rev_count = 0;
-//	checking = false;
-//	return test;
-//}
+	InvalidateRect(m_hWnd, NULL, TRUE);
+}
 
-
-//void GameManager::DestroyTimer()
-//{
-//	KillTimer(m_hWnd, 1);
-//	first->ChangeRear();
-//	second->ChangeRear();
-//	InvalidateRect(m_hWnd, NULL, TRUE);
-//}
+void GameManager::UpdateTimer()
+{
+	if (m_state == GamePlay)
+	{
+		timelimit--;
+		if (timelimit <= 0)
+		{
+			m_state = GameEnd;
+		}
+		InvalidateRect(m_hWnd, NULL, TRUE);
+	}
+}
 
 GameManager::~GameManager()
 {

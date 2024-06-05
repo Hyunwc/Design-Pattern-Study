@@ -11,7 +11,7 @@ enum GameState
 {
 	MainMenu,
 	GamePlay,
-	GameOver
+	GameEnd
 };
 
 class GameManager
@@ -26,6 +26,8 @@ private:
 	Card* first;
 	Card* second;
 	int rev_count = 0;
+	int finish_count = 0;
+	int timelimit = 60;
 	bool checking; //카드 체크중일 때 클릭이 되지 않게 하기 위한 변수
 	GameManager() {}
 public:
@@ -52,5 +54,6 @@ public:
 	bool CheckCollide(POINT point);
 	void CardCheck();
 	void DestroyTimer();
+	void UpdateTimer();
 };
 
