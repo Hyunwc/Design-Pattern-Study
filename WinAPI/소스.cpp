@@ -43,6 +43,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 
 	KillTimer(hWnd, 1);
 	KillTimer(hWnd, 2);
+	KillTimer(hWnd, 3);
 	return (int)Message.wParam;
 }
 
@@ -95,6 +96,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		{
 			GameManager::Instance()->UpdateTimer();
 		}
+		else if (wParam == 3)
+		{
+			GameManager::Instance()->Init(hWnd);
+			GameManager::Instance()->SetState(MainMenu);
+			KillTimer(hWnd, 3);
+			InvalidateRect(hWnd, NULL, TRUE);
+		}
 		return 0;
 	}
 	case WM_DESTROY:
@@ -102,6 +110,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//delete BitMapManager::GetInstance();
 		KillTimer(hWnd, 1);
 		KillTimer(hWnd, 2);
+		KillTimer(hWnd, 3);
 		GameManager::Release();
 		PostQuitMessage(0);
 		return 0;

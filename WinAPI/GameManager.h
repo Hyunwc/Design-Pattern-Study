@@ -1,6 +1,6 @@
 #pragma once
 //#include "BitMap.h"
-//#include "BitMapManager.h"
+#include "BitMapManager.h"
 #include "Card.h"
 #include <vector>
 #include <ctime>
@@ -29,6 +29,7 @@ private:
 	int finish_count = 0;
 	int timelimit = 60;
 	bool checking; //카드 체크중일 때 클릭이 되지 않게 하기 위한 변수
+	bool isWin; 
 	GameManager() {}
 public:
 	~GameManager();
@@ -51,9 +52,11 @@ public:
 	void Init(HWND hWnd); //초기화
 	void Draw(HDC hdc);
 	int GetRevCount() { return rev_count; }
+	void SetState(GameState state) { m_state = state; }
 	bool CheckCollide(POINT point);
 	void CardCheck();
 	void DestroyTimer();
 	void UpdateTimer();
+	void ResetData(); //모든 정보를 초기 상태로
 };
 

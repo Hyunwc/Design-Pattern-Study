@@ -9,19 +9,32 @@ void GameManager::Init(HWND hWnd)
 	first = nullptr;
 	second = nullptr;
 	timelimit = 60;
+	finish_count = 0;
+	isWin = false;
+	m_cards.clear();
 	//비트맵 배열에 이미지 경로 넣는 작업.
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_state = MainMenu;
-	//테스트용 렉트 영역(나중에 수정 할 예정)
-	startRect.left = 300;
-	startRect.top = 350;
-	startRect.right = 500;
-	startRect.bottom = 400;
 
-	endRect.left = 300;
-	endRect.top = 450;
-	endRect.right = 500;
-	endRect.bottom = 500;
+	int windowWidth = 800;
+	int windowHeight = 800;
+	int btnWidth = 200;
+	int btnHeight = 50;
+	
+
+	//(800 - 200) / 2 = 300
+	startRect.left = (windowWidth - btnWidth) / 2;
+	//(800 - 50) / 2 - 50 = 325
+	startRect.top = (windowHeight - btnHeight) / 2 - 50;
+	//300 + 200 = 500
+	startRect.right = startRect.left + btnWidth;
+	//325 + 50 = 375
+	startRect.bottom = startRect.top + btnHeight;
+
+	endRect.left = startRect.left;
+	endRect.top = startRect.bottom + btnHeight;
+	endRect.right = startRect.right;
+	endRect.bottom = endRect.top + btnHeight;
 
 	// 카드 간격과 크기 정의
 	const int CARD_WIDTH = 100;
@@ -30,7 +43,7 @@ void GameManager::Init(HWND hWnd)
 	const int Y_SPACING = 10;
 
 	// 첫 번째 카드의 위치
-	int xStart = 100;
+	int xStart = 120;
 	int yStart = 100;
 
 	// 이미지 배열
@@ -67,6 +80,7 @@ void GameManager::Init(HWND hWnd)
 
 	}
 
+	//제한시간을 위한 타이머
 	SetTimer(m_hWnd, 2, 1000, NULL);
 }
 
@@ -81,12 +95,13 @@ void GameManager::Draw(HDC hdc)
 	{
 	case MainMenu:
 	{
+		//BitMapManager::GetInstance()->GetBackground()->BackGroundDraw(hdc, 0, 0);
 		//left, top, right, bottom
-		Rectangle(hdc, 300, 350, 500, 400);
+		Rectangle(hdc, startRect.left, startRect.top, startRect.right, startRect.bottom);
 		//맨 뒤에 파라미터는 문자열의 길이
-		TextOut(hdc, 350, 365, TEXT("StartGame"), 9);
-		Rectangle(hdc, 300, 450, 500, 500);
-		TextOut(hdc, 350, 465, TEXT("EndGame"), 7);
+		TextOut(hdc, 370, 340, TEXT("StartGame"), 9);
+		Rectangle(hdc, endRect.left, endRect.top, endRect.right, endRect.bottom);
+		TextOut(hdc, 370, 440, TEXT("EndGame"), 7);
 		break;
 	}
 	//게임 플레이
@@ -103,13 +118,18 @@ void GameManager::Draw(HDC hdc)
 		sprintf_s(c_buf,  "finish : %d", finish_count);
 		TextOutA(hdc, 350, 10, g_buf, strlen(g_buf));
 		TextOutA(hdc, 700, 10, c_buf, strlen(c_buf));
+
+		
 		//카드를 그리고 나서 여기서 같은짝인지 체크를 하는 함수를 호출해야 할듯
 		break;
 	}
 
 	case GameEnd:
 	{
-		TextOut(hdc, 10, 10, TEXT("Game Over"), 9);
+		if (isWin)
+			TextOut(hdc, 370, 380, TEXT("Win!"), 4);
+		else
+			TextOut(hdc, 370, 380, TEXT("Lose!"), 5);
 		break;
 	}
 
@@ -132,13 +152,14 @@ bool GameManager::CheckCollide(POINT point)
 		if (PtInRect(&startRect, point))
 		{
 			//게임 플레이 상태로 변경
+			
 			m_state = GamePlay;
 			return true;
 		}
 		else if (PtInRect(&endRect, point))
 		{
-			m_state = GameEnd;
-			return true;
+			PostQuitMessage(0);
+			//return true;
 		}
 		break;
 	}
@@ -181,13 +202,6 @@ bool GameManager::CheckCollide(POINT point)
 
 void GameManager::CardCheck()
 {
-	if (finish_count == m_cards.size() / 2)
-	{
-		m_state = MainMenu;
-		system("pause");
-		InvalidateRect(m_hWnd, NULL, TRUE);
-		return;
-	}
 	//첫카드와 둘째카드 비교해서 같지 않다면 둘다 뒷면으로변경
 	//같으면 그냥 냅두고 포인터와 횟수 초기화만 
 	if (first->GetIndex() != second->GetIndex())
@@ -200,36 +214,64 @@ void GameManager::CardCheck()
 		finish_count++;
 		rev_count = 0;
 		checking = false;
+
+		//if (finish_count == m_cards.size() / 2)
+		//{
+		//	m_state = MainMenu;
+		//	Init(m_hWnd);
+		//	//InvalidateRect(m_hWnd, NULL, TRUE);
+		//}
+
+		if (finish_count == m_cards.size() / 2)
+		{
+			isWin = true;
+			m_state = GameEnd;
+			SetTimer(m_hWnd, 3, 5000, NULL);
+			
+			/*m_state = MainMenu;
+			Init(m_hWnd);*/
+			//InvalidateRect(m_hWnd, NULL, TRUE);
+		}
 	}
 }
 
 void GameManager::DestroyTimer()
 {
+	//1번 타이머 해제 후 카드들 다시 뒷면으로. count 초기화.
 	KillTimer(m_hWnd, 1);
 	first->ChangeRear();
 	second->ChangeRear();
 	rev_count = 0;
 	checking = false;
 
-	if (finish_count == m_cards.size() / 2)
+	/*if (finish_count == m_cards.size() / 2)
 	{
 		m_state = MainMenu;
-	}
+		Init(m_hWnd);
+	}*/
 
 	InvalidateRect(m_hWnd, NULL, TRUE);
 }
 
 void GameManager::UpdateTimer()
 {
+	//게임 플레이 중이면서. 호출될 때마다 타이머 감소.
+	//타이머가 0가 되면 게임종료.
 	if (m_state == GamePlay)
 	{
 		timelimit--;
 		if (timelimit <= 0)
 		{
 			m_state = GameEnd;
+			//SetTimer(m_hWnd, 3, 2000, NULL);
+			SetTimer(m_hWnd, 3, 5000, NULL);
 		}
 		InvalidateRect(m_hWnd, NULL, TRUE);
 	}
+}
+
+void GameManager::ResetData()
+{
 }
 
 GameManager::~GameManager()
