@@ -12,6 +12,7 @@ private:
 public:
 	void Init(HDC hdc,char* FileName);
 	void Draw(HDC hdc, int x, int y);
+	void Draw(HDC hdc, int x, int y, int w, int h);
 	inline SIZE GetSize()
 	{
 		return m_Size;

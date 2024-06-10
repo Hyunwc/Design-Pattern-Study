@@ -28,6 +28,16 @@ void BitMap::Draw(HDC hdc, int x, int y)
 	StretchBlt(hdc, x, y, 100, 150, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
 }
 
+//x랑 y는 화면에 그려질 시작 좌표 
+//배경화면 Draw할 함수
+void BitMap::Draw(HDC hdc, int x, int y, int w, int h)
+{
+	//크기 변경이 가능한 이미지.
+	//화면상 좌표, 화면상에 그려지는 너비 높이, 원본 이미지 xy좌표, 
+	
+	StretchBlt(hdc, x, y, w, h, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
+}
+
 
 BitMap::~BitMap()
 {

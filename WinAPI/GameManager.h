@@ -1,5 +1,5 @@
 #pragma once
-//#include "BitMap.h"
+#include "BitMap.h"
 #include "BitMapManager.h"
 #include "Card.h"
 #include <vector>
@@ -21,6 +21,7 @@ private:
 	HWND m_hWnd; //핸들
 	GameState m_state; //현재 게임 상태
 	RECT startRect, endRect; //메인때 사용할 사각형 영역들
+	BitMap* m_bitmap;
 	static GameManager* instance;
 	//잠시 테스트용으로 사용할 변수들 
 	Card* first;

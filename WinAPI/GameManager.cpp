@@ -14,6 +14,8 @@ void GameManager::Init(HWND hWnd)
 	m_cards.clear();
 	//비트맵 배열에 이미지 경로 넣는 작업.
 	BitMapManager::GetInstance()->Init(m_hWnd);
+	m_bitmap = BitMapManager::GetInstance()->GetImage(IMAGE_BACKGROUND);
+	//m_bitmap = BitMapManager::GetInstance()->GetTest();
 	m_state = MainMenu;
 
 	int windowWidth = 800;
@@ -86,7 +88,7 @@ void GameManager::Init(HWND hWnd)
 
 void GameManager::Draw(HDC hdc)
 {
-
+	m_bitmap->Draw(hdc, 0, 0, 800, 800);
 	// Rectangle함수 이용(hdc, left, top, right, bottom까지 4개의 매개변수)
 	// left 사각형 왼쪽 x right 사각형 오른쪽 x 
 
@@ -95,6 +97,7 @@ void GameManager::Draw(HDC hdc)
 	{
 	case MainMenu:
 	{
+		
 		//BitMapManager::GetInstance()->GetBackground()->BackGroundDraw(hdc, 0, 0);
 		//left, top, right, bottom
 		Rectangle(hdc, startRect.left, startRect.top, startRect.right, startRect.bottom);
@@ -115,7 +118,7 @@ void GameManager::Draw(HDC hdc)
 		char g_buf[256];
 		char c_buf[256];
 		sprintf_s(g_buf,  "%d : %d", 0, timelimit);
-		sprintf_s(c_buf,  "finish : %d", finish_count);
+		sprintf_s(c_buf,  "finish : %d / %d", finish_count, m_cards.size() / 2);
 		TextOutA(hdc, 350, 10, g_buf, strlen(g_buf));
 		TextOutA(hdc, 700, 10, c_buf, strlen(c_buf));
 
@@ -126,6 +129,8 @@ void GameManager::Draw(HDC hdc)
 
 	case GameEnd:
 	{
+		TextOut(hdc, 270, 360, TEXT("5초 뒤에 메인 메뉴로 이동합니다."), 19);
+
 		if (isWin)
 			TextOut(hdc, 370, 380, TEXT("Win!"), 4);
 		else
@@ -215,22 +220,11 @@ void GameManager::CardCheck()
 		rev_count = 0;
 		checking = false;
 
-		//if (finish_count == m_cards.size() / 2)
-		//{
-		//	m_state = MainMenu;
-		//	Init(m_hWnd);
-		//	//InvalidateRect(m_hWnd, NULL, TRUE);
-		//}
-
 		if (finish_count == m_cards.size() / 2)
 		{
 			isWin = true;
 			m_state = GameEnd;
 			SetTimer(m_hWnd, 3, 5000, NULL);
-			
-			/*m_state = MainMenu;
-			Init(m_hWnd);*/
-			//InvalidateRect(m_hWnd, NULL, TRUE);
 		}
 	}
 }
