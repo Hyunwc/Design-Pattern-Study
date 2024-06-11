@@ -14,7 +14,7 @@ void GameManager::Init(HWND hWnd)
 	m_cards.clear();
 	//비트맵 배열에 이미지 경로 넣는 작업.
 	BitMapManager::GetInstance()->Init(m_hWnd);
-	m_bitmap = BitMapManager::GetInstance()->GetImage(IMAGE_BACKGROUND);
+	m_background = BitMapManager::GetInstance()->GetImage(IMAGE_BACKGROUND);
 	//m_bitmap = BitMapManager::GetInstance()->GetTest();
 	m_state = MainMenu;
 
@@ -25,24 +25,24 @@ void GameManager::Init(HWND hWnd)
 	
 
 	//(800 - 200) / 2 = 300
-	startRect.left = (windowWidth - btnWidth) / 2;
+	startRect.left = (WINDOW_WIDTH - BUTTON_WIDTH) / 2;
 	//(800 - 50) / 2 - 50 = 325
-	startRect.top = (windowHeight - btnHeight) / 2 - 50;
+	startRect.top = (WINDOW_HEIGHT - BUTTON_HEIGHT) / 2 - 50;
 	//300 + 200 = 500
-	startRect.right = startRect.left + btnWidth;
+	startRect.right = startRect.left + BUTTON_WIDTH;
 	//325 + 50 = 375
-	startRect.bottom = startRect.top + btnHeight;
+	startRect.bottom = startRect.top + BUTTON_HEIGHT;
 
 	endRect.left = startRect.left;
-	endRect.top = startRect.bottom + btnHeight;
+	endRect.top = startRect.bottom + BUTTON_HEIGHT;
 	endRect.right = startRect.right;
-	endRect.bottom = endRect.top + btnHeight;
+	endRect.bottom = endRect.top + BUTTON_HEIGHT;
 
 	// 카드 간격과 크기 정의
-	const int CARD_WIDTH = 100;
+	/*const int CARD_WIDTH = 100;
 	const int CARD_HEIGHT = 150;
 	const int X_SPACING = 10;
-	const int Y_SPACING = 10;
+	const int Y_SPACING = 10;*/
 
 	// 첫 번째 카드의 위치
 	int xStart = 120;
@@ -71,8 +71,8 @@ void GameManager::Init(HWND hWnd)
 			// 카드 위치 계산
 			// (100,100) (210, 100) (320, 100) (430, 100) (540, 100)
 
-			int x = xStart + j * (CARD_WIDTH + X_SPACING);
-			int y = yStart + i * (CARD_HEIGHT + Y_SPACING);
+			int x = xStart + j * (CARD_WIDTH + SPACING);
+			int y = yStart + i * (CARD_HEIGHT + SPACING);
 
 			//카드의 인덱스, 그려질 x, y좌표
 			card.Init(images[index], x, y);
@@ -88,7 +88,7 @@ void GameManager::Init(HWND hWnd)
 
 void GameManager::Draw(HDC hdc)
 {
-	m_bitmap->Draw(hdc, 0, 0, 800, 800);
+	m_background->Draw(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	// Rectangle함수 이용(hdc, left, top, right, bottom까지 4개의 매개변수)
 	// left 사각형 왼쪽 x right 사각형 오른쪽 x 
 
@@ -110,37 +110,61 @@ void GameManager::Draw(HDC hdc)
 	//게임 플레이
 	case GamePlay:
 	{
+		HFONT font = CreateFont(30, 0, 0, 0, 0, 0, 0, 0,
+			HANGEUL_CHARSET, 0, 0, 0, 0, L"궁서");
+		HFONT oldfont = (HFONT)SelectObject(hdc, font);
+		SetBkMode(hdc, TRANSPARENT);
 		//벡터에 저장된 카드들 Draw() 호출
 		for (auto& card : m_cards)
 		{
 			card.Draw(hdc);
 		}
+
 		char g_buf[256];
 		char c_buf[256];
 		sprintf_s(g_buf,  "%d : %d", 0, timelimit);
 		sprintf_s(c_buf,  "finish : %d / %d", finish_count, m_cards.size() / 2);
-		TextOutA(hdc, 350, 10, g_buf, strlen(g_buf));
-		TextOutA(hdc, 700, 10, c_buf, strlen(c_buf));
+		TextOutA(hdc, 350, 20, g_buf, strlen(g_buf));
+		TextOutA(hdc, 550, 20, c_buf, strlen(c_buf));
+
+		//제한시간이 10초 미만일 경우 빨간색으로 출력되게 
+		if (timelimit < 10)
+		{
+			SetTextColor(hdc, RGB(255, 0, 0));
+			TextOutA(hdc, 350, 20, g_buf, strlen(g_buf));
+		}
 
 		
+		SelectObject(hdc, oldfont);
+		DeleteObject(font);
 		//카드를 그리고 나서 여기서 같은짝인지 체크를 하는 함수를 호출해야 할듯
 		break;
 	}
 
 	case GameEnd:
 	{
-		TextOut(hdc, 270, 360, TEXT("5초 뒤에 메인 메뉴로 이동합니다."), 19);
+		HFONT font = CreateFont(30, 0, 0, 0, 0, 0, 0, 0,
+			HANGEUL_CHARSET, 0, 0, 0, 0, L"궁서");
+		HFONT oldfont = (HFONT)SelectObject(hdc, font);
+		SetBkMode(hdc, TRANSPARENT);
+		TextOut(hdc, 170, 360, TEXT("5초 뒤에 메인 메뉴로 이동합니다."), 19);
 
 		if (isWin)
-			TextOut(hdc, 370, 380, TEXT("Win!"), 4);
+			TextOut(hdc, 350, 400, TEXT("Win!"), 4);
 		else
-			TextOut(hdc, 370, 380, TEXT("Lose!"), 5);
+			TextOut(hdc, 350, 400, TEXT("Lose!"), 5);
+
+		SelectObject(hdc, oldfont);
+		DeleteObject(font);
+
 		break;
 	}
 
 	default:
 		break;
 	}
+
+	
 
 }
 

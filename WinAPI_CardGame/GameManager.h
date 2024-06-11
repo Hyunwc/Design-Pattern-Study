@@ -7,6 +7,14 @@
 #include <algorithm>
 #include <Windows.h>
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 800
+#define BUTTON_WIDTH 200
+#define BUTTON_HEIGHT 50
+#define CARD_WIDTH 100
+#define CARD_HEIGHT 150
+#define SPACING 10
+
 enum GameState
 {
 	MainMenu,
@@ -21,7 +29,7 @@ private:
 	HWND m_hWnd; //핸들
 	GameState m_state; //현재 게임 상태
 	RECT startRect, endRect; //메인때 사용할 사각형 영역들
-	BitMap* m_bitmap;
+	BitMap* m_background;
 	static GameManager* instance;
 	//잠시 테스트용으로 사용할 변수들 
 	Card* first;
