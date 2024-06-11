@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <Windows.h>
 
-#define WINDOW_WIDTH 800
+#define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 800
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 50

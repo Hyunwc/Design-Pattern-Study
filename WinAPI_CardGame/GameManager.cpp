@@ -18,12 +18,6 @@ void GameManager::Init(HWND hWnd)
 	//m_bitmap = BitMapManager::GetInstance()->GetTest();
 	m_state = MainMenu;
 
-	int windowWidth = 800;
-	int windowHeight = 800;
-	int btnWidth = 200;
-	int btnHeight = 50;
-	
-
 	//(800 - 200) / 2 = 300
 	startRect.left = (WINDOW_WIDTH - BUTTON_WIDTH) / 2;
 	//(800 - 50) / 2 - 50 = 325
@@ -38,15 +32,9 @@ void GameManager::Init(HWND hWnd)
 	endRect.right = startRect.right;
 	endRect.bottom = endRect.top + BUTTON_HEIGHT;
 
-	// 카드 간격과 크기 정의
-	/*const int CARD_WIDTH = 100;
-	const int CARD_HEIGHT = 150;
-	const int X_SPACING = 10;
-	const int Y_SPACING = 10;*/
-
 	// 첫 번째 카드의 위치
-	int xStart = 120;
-	int yStart = 100;
+	int xStart = 20;
+	int yStart = 115;
 
 	// 이미지 배열
 	vector<IMAGE> images;
@@ -97,14 +85,12 @@ void GameManager::Draw(HDC hdc)
 	{
 	case MainMenu:
 	{
-		
-		//BitMapManager::GetInstance()->GetBackground()->BackGroundDraw(hdc, 0, 0);
 		//left, top, right, bottom
 		Rectangle(hdc, startRect.left, startRect.top, startRect.right, startRect.bottom);
 		//맨 뒤에 파라미터는 문자열의 길이
-		TextOut(hdc, 370, 340, TEXT("StartGame"), 9);
+		TextOut(hdc, 270, 340, TEXT("StartGame"), 9);
 		Rectangle(hdc, endRect.left, endRect.top, endRect.right, endRect.bottom);
-		TextOut(hdc, 370, 440, TEXT("EndGame"), 7);
+		TextOut(hdc, 270, 440, TEXT("EndGame"), 7);
 		break;
 	}
 	//게임 플레이
@@ -124,17 +110,16 @@ void GameManager::Draw(HDC hdc)
 		char c_buf[256];
 		sprintf_s(g_buf,  "%d : %d", 0, timelimit);
 		sprintf_s(c_buf,  "finish : %d / %d", finish_count, m_cards.size() / 2);
-		TextOutA(hdc, 350, 20, g_buf, strlen(g_buf));
-		TextOutA(hdc, 550, 20, c_buf, strlen(c_buf));
+		TextOutA(hdc, 250, 20, g_buf, strlen(g_buf));
+		TextOutA(hdc, 200, 60, c_buf, strlen(c_buf));
 
 		//제한시간이 10초 미만일 경우 빨간색으로 출력되게 
 		if (timelimit < 10)
 		{
 			SetTextColor(hdc, RGB(255, 0, 0));
-			TextOutA(hdc, 350, 20, g_buf, strlen(g_buf));
+			TextOutA(hdc, 250, 20, g_buf, strlen(g_buf));
 		}
 
-		
 		SelectObject(hdc, oldfont);
 		DeleteObject(font);
 		//카드를 그리고 나서 여기서 같은짝인지 체크를 하는 함수를 호출해야 할듯
@@ -147,25 +132,21 @@ void GameManager::Draw(HDC hdc)
 			HANGEUL_CHARSET, 0, 0, 0, 0, L"궁서");
 		HFONT oldfont = (HFONT)SelectObject(hdc, font);
 		SetBkMode(hdc, TRANSPARENT);
-		TextOut(hdc, 170, 360, TEXT("5초 뒤에 메인 메뉴로 이동합니다."), 19);
+		TextOut(hdc, 70, 360, TEXT("5초 뒤에 메인 메뉴로 이동합니다."), 19);
 
 		if (isWin)
-			TextOut(hdc, 350, 400, TEXT("Win!"), 4);
+			TextOut(hdc, 250, 400, TEXT("Win!"), 4);
 		else
-			TextOut(hdc, 350, 400, TEXT("Lose!"), 5);
+			TextOut(hdc, 250, 400, TEXT("Lose!"), 5);
 
 		SelectObject(hdc, oldfont);
 		DeleteObject(font);
 
 		break;
 	}
-
 	default:
 		break;
 	}
-
-	
-
 }
 
 
@@ -181,7 +162,6 @@ bool GameManager::CheckCollide(POINT point)
 		if (PtInRect(&startRect, point))
 		{
 			//게임 플레이 상태로 변경
-			
 			m_state = GamePlay;
 			return true;
 		}
@@ -261,13 +241,6 @@ void GameManager::DestroyTimer()
 	second->ChangeRear();
 	rev_count = 0;
 	checking = false;
-
-	/*if (finish_count == m_cards.size() / 2)
-	{
-		m_state = MainMenu;
-		Init(m_hWnd);
-	}*/
-
 	InvalidateRect(m_hWnd, NULL, TRUE);
 }
 
@@ -281,7 +254,6 @@ void GameManager::UpdateTimer()
 		if (timelimit <= 0)
 		{
 			m_state = GameEnd;
-			//SetTimer(m_hWnd, 3, 2000, NULL);
 			SetTimer(m_hWnd, 3, 5000, NULL);
 		}
 		InvalidateRect(m_hWnd, NULL, TRUE);

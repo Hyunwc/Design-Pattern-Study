@@ -31,7 +31,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPervlnstance, LPSTR lpszCmd
 	
 	//WS_OVERLAPPEDWINDOW(기본 구성 : 모든 것들이 다 있음) WS_THICKFREME이 포함되기 때문에 윈도우 크기가 조절 가능했던 것
 	//SYSMENU X버튼과 MINIMIZEBOX 최소화만 사용하자
-	hWnd = CreateWindow(lpszClass, lpszClass, WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 800, 800,
+	hWnd = CreateWindow(lpszClass, lpszClass, WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, WINDOW_WIDTH, WINDOW_HEIGHT,
 		NULL, (HMENU)NULL, hInstance, NULL);
 	ShowWindow(hWnd, nCmdShow);
 
