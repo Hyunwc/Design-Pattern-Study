@@ -22,6 +22,18 @@ enum IMAGE
 	IMAGE_END
 };
 
+//enum BLACK
+//{
+//	BLACK_START,
+//	BLACK_PAWN = 0,
+//	BLACK_KNIGHT,
+//	BLACK_BISHOP,
+//	BLACK_ROOK,
+//	BLACK_QUEEN,
+//	BLACK_KING,
+//	BLACK_END
+//};
+
 class BitMapManager
 {
 private:

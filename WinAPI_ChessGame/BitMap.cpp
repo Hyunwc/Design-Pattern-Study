@@ -19,7 +19,7 @@ void BitMap::Init(HDC hdc, char* FileName)
 
 void BitMap::Draw(HDC hdc, int x, int y)
 {
-	StretchBlt(hdc, x, y, 0, 0, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
+	StretchBlt(hdc, x, y, 75, 75, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
 }
 
 BitMap::~BitMap()
