@@ -2,9 +2,12 @@
 #include "BitMap.h"
 #include "BitMapManager.h"
 #include "Board.h"
+#include "Piece.h"
+#include "Pawn.h"
 
 #define XSTART 0
 #define YSTART 0
+#define TILE_SIZE 75
 
 class GameManager
 {
@@ -13,9 +16,10 @@ private:
 	//테스트용
 	BitMap* m_tile1;
 	BitMap* m_tile2;
-	vector<Board> m_boards;
 	HWND m_hWnd;
 	HDC m_hdc;
+	RECT m_board[8][8]; //타일 영역 
+	Piece* m_pieces[8][8]; 
 
 	GameManager(){}
 public:
@@ -37,4 +41,7 @@ public:
 
 	void Init(HWND hWnd);
 	void Draw(HDC hdc);
+	void InitBoard(); //보드 초기화
+	void InitPieces(); //말 초기화
+	void DrawPieces(HDC hdc); //말 Draw
 };
