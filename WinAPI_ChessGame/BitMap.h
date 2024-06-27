@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#pragma comment(lib, "msimg32.lib")
 using namespace std;
 
 class BitMap

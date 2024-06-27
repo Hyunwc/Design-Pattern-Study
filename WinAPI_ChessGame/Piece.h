@@ -6,13 +6,16 @@
 class Piece
 {
 protected:
-	RECT m_rect; //말들의 영역
-	int m_x;
-	int m_y;
+	BitMap* m_pBitMap;
+	int m_ix;
+	int m_iy;
+	RECT m_rect;
+	IMAGE m_imageIndex;
 public:
 	Piece(int x, int y);
-	void SetPosition(int x, int y);
+	virtual void Init(int x, int y);
 	RECT GetRect() { return m_rect; }
+	//virtual void Move() = 0;
 	virtual void Draw(HDC hdc) = 0;
-	virtual ~Piece(){}
+	virtual ~Piece() {}
 };

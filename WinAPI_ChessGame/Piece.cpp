@@ -1,29 +1,28 @@
 #include "Piece.h"
 
-Piece::Piece(int x, int y) : m_x(x), m_y(y)
+Piece::Piece(int x, int y) : m_ix(x), m_iy(y)
 {
-	SetPosition(x, y);
+	Init(x, y);
 }
-//위치 설정.
-void Piece::SetPosition(int x, int y)
+
+void Piece::Init(int x, int y)
 {
-	m_x = x;
-	m_y = y;
-	//[1][0] = 75, 0, 150, 75
-	//[1][1] = 75, 75, 150, 150
-	//[1][2] = 75, 150, 150, 225
-	//[1][3] = 75, 225, 150, 300
-	/*m_rect.left = x * 75;
-	m_rect.top = y * 75;
-	m_rect.right = m_rect.left + 75;
-	m_rect.bottom = m_rect.top + 75;*/
-	//위가 아닌
-	//[1][0] = 0, 75, 75, 150
-	//[1][1] = 75,75, 150, 150
-	//[1][2] = 150, 75, 225, 150
-    m_rect.left = y * 75; //0부터
-	m_rect.top = x * 75; // 75
+	//인덱스는 상속받은 클래스에서 설정
+	//영역은 여기있는 것들 그대로 사용할 것.
+	//m_imageIndex = Index;
+	//m_pBitMap = BitMapManager::GetInstance()->GetImage(Index);
+	m_ix = x;
+	m_iy = y;
+	m_rect.left = x;
+	m_rect.top = y;
 	m_rect.right = m_rect.left + 75;
 	m_rect.bottom = m_rect.top + 75;
-
+	//m_rect.right = m_rect.left + m_pBitMap->GetSize().cx;
+	//m_rect.bottom = m_rect.top + m_pBitMap->GetSize().cy;
 }
+
+//void Pawn::Init(int x, int y)
+//{
+//	m_pBitMap = BitMapManager::GetInstance()->GetImage(Index);
+//	Piece::Init(x, y);
+//}

@@ -131,6 +131,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         GameManager::Instance()->Init(hWnd);
         return 0;
+    case WM_LBUTTONDOWN:
+        Point.x = LOWORD(lParam);
+        Point.y = HIWORD(lParam);
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
         GameManager::Instance()->Draw(hdc);
