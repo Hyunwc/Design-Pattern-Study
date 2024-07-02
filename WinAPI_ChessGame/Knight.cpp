@@ -1,16 +1,12 @@
 #include "Knight.h"
 
-Knight::Knight(int x, int y) : Piece(x, y)
+Knight::Knight(int x, int y, IMAGE index) : Piece(x, y, index)
 {
 	Init(x, y);
 }
 
 void Knight::Init(int x, int y)
 {
-	if (y / 75 == 0)
-		m_pBitMap = BitMapManager::GetInstance()->GetImage(IMAGE_BLACK_KNIGHT);
-	else
-		m_pBitMap = BitMapManager::GetInstance()->GetImage(IMAGE_WHITE_KNIGHT);
 
 	Piece::Init(x, y);
 }

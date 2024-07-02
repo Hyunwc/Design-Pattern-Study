@@ -1,16 +1,12 @@
 #include "Queen.h"
 
-Queen::Queen(int x, int y) : Piece(x, y)
+Queen::Queen(int x, int y, IMAGE index) : Piece(x, y, index)
 {
 	Init(x, y);
 }
 
 void Queen::Init(int x, int y)
 {
-	if (y / 75 == 0)
-		m_pBitMap = BitMapManager::GetInstance()->GetImage(IMAGE_BLACK_QUEEN);
-	else
-		m_pBitMap = BitMapManager::GetInstance()->GetImage(IMAGE_WHITE_QUEEN);
 
 	Piece::Init(x, y);
 }

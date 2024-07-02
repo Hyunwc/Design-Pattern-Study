@@ -46,39 +46,66 @@ void GameManager::InitPiece()
 	//백색 폰
 	for (int i = 0; i < 8; i++)
 	{
-		Piece* p = new Pawn(i * 75, 450);
+		Piece* p = new Pawn(i, 6, IMAGE_WHITE_PAWN);
 		m_pieces[0][i] = p;
 	}
 	//흑색 폰
 	for (int i = 0; i < 8; i++)
 	{
-		Piece* p = new Pawn(i * 75, 75);
+		Piece* p = new Pawn(i, 1, IMAGE_BLACK_PAWN);
 		m_pieces[1][i] = p;
 	}
+
+	
 	//백색 루크
-	m_pieces[0][8] = new Rook(0, 525);
-	m_pieces[0][9] = new Rook(525, 525);
+	m_pieces[0][8] = new Rook(0, 7, IMAGE_WHITE_ROOK);
+	m_pieces[0][9] = new Rook(7, 7, IMAGE_WHITE_ROOK);
 	//흑색 루크
-	m_pieces[1][8] = new Rook(0, 0);
-	m_pieces[1][9] = new Rook(525, 0);
+	m_pieces[1][8] = new Rook(0, 0, IMAGE_BLACK_ROOK);
+	m_pieces[1][9] = new Rook(7, 0, IMAGE_BLACK_ROOK);
 	//백색 나이트
-	m_pieces[0][10] = new Knight(75, 525);
-	m_pieces[0][11] = new Knight(450, 525);
+	m_pieces[0][10] = new Knight(1, 7, IMAGE_WHITE_KNIGHT);
+	m_pieces[0][11] = new Knight(6, 7, IMAGE_WHITE_KNIGHT);
 	//흑색 나이트
-	m_pieces[1][10] = new Knight(75, 0);
-	m_pieces[1][11] = new Knight(450, 0);
+	m_pieces[1][10] = new Knight(1, 0, IMAGE_BLACK_KNIGHT);
+	m_pieces[1][11] = new Knight(6, 0, IMAGE_BLACK_KNIGHT);
 	//백색 비숍
-	m_pieces[0][12] = new Bishop(150, 525);
-	m_pieces[0][13] = new Bishop(375, 525);
+	m_pieces[0][12] = new Bishop(2, 7, IMAGE_WHITE_BISHOP);
+	m_pieces[0][13] = new Bishop(5, 7, IMAGE_WHITE_BISHOP);
 	//흑색 비숍
-	m_pieces[1][12] = new Bishop(150, 0);
-	m_pieces[1][13] = new Bishop(375, 0);
+	m_pieces[1][12] = new Bishop(2, 0, IMAGE_BLACK_BISHOP);
+	m_pieces[1][13] = new Bishop(5, 0, IMAGE_BLACK_BISHOP);
 	//백색 퀸과 킹
-	m_pieces[0][14] = new Queen(225, 525);
-	m_pieces[0][15] = new King(300, 525);
+	m_pieces[0][14] = new Queen(3, 7, IMAGE_WHITE_QUEEN);
+	m_pieces[0][15] = new King(4, 7, IMAGE_WHITE_KING);
 	//흑색 퀸과 킹
-	m_pieces[1][14] = new Queen(225, 0);
-	m_pieces[1][15] = new King(300, 0);
+	m_pieces[1][14] = new Queen(3, 0, IMAGE_BLACK_QUEEN);
+	m_pieces[1][15] = new King(4, 0, IMAGE_BLACK_KING);
+	
+}
+
+bool GameManager::CheckCollide(POINT point)
+{
+	/*for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 16; j++)(
+		{
+			if (m_pieces[i][j] != nullptr && PtInRect(&m_pieces[i][j]->GetRect(), point))
+			{
+				return true;
+			}
+		}
+	}*/
+
+	//1.잘 되는지 테스트부터->일단 화면 갱신은 됨
+	//SetPosition이용하여 좌표 이동시키고.
+	if (PtInRect(m_pieces[1][1]->GetRect(), point))
+	{
+		m_pieces[1][1]->Init(1, 2);
+		return true;
+	}
+
+	return false;
 }
 
 

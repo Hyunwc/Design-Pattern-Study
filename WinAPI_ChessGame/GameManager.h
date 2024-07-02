@@ -49,6 +49,7 @@ public:
 	void Init(HWND hWnd);
 	void InitBoard(); //보드 초기화
 	void InitPiece(); //말 초기화
+	bool CheckCollide(POINT point);
 
 	void Draw(HDC hdc);
 	void PieceDraw(HDC hdc);
