@@ -11,7 +11,7 @@ void GameManager::Init(HWND hWnd)
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_tile1 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE1);
 	m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE2);
-
+	m_rBitMap = BitMapManager::GetInstance()->GetImage(IMAGE_MOVETILE);
 	InitBoard();
 	InitPiece();
 }
@@ -101,7 +101,6 @@ bool GameManager::CheckCollide(POINT point)
 	//SetPosition이용하여 좌표 이동시키고.
 	if (PtInRect(m_pieces[1][1]->GetRect(), point))
 	{
-		m_pieces[1][1]->Init(1, 2);
 		return true;
 	}
 
@@ -149,6 +148,12 @@ void GameManager::PieceDraw(HDC hdc)
 			p->Draw(hdc);
 	}
 }
+
+void GameManager::RouteDraw(HDC hdc)
+{
+	
+}
+
 
 GameManager::~GameManager()
 {

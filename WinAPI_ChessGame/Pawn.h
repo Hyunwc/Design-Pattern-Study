@@ -8,6 +8,7 @@ private:
 public:
 	Pawn(int x, int y, IMAGE index);
 	void Init(int x, int y) override;
-	void SetImage(PIECE_COLOR color) override;
+	bool RouteNav() override;
 	void Draw(HDC hdc) override;
+	void RouteDraw(HDC hdc) override;
 };
