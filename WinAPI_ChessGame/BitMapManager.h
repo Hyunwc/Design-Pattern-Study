@@ -39,6 +39,7 @@ class BitMapManager
 {
 private:
 	BitMap* m_parrBitMap;
+	BitMap* m_tile;
 	static BitMapManager* m_hThis;
 	BitMapManager();
 public:
@@ -59,6 +60,10 @@ public:
 	BitMap* GetImage(IMAGE index)
 	{
 		return &m_parrBitMap[index];
+	}
+	BitMap* GetTestTile()
+	{
+		return m_tile;
 	}
 
 	void Init(HWND hWnd);

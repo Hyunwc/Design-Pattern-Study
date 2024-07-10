@@ -6,9 +6,9 @@ class Pawn : public Piece
 private:
 	bool firstMove;
 public:
-	Pawn(int x, int y, IMAGE index);
+	Pawn(int x, int y, IMAGE index, PIECE_COLOR color);
 	void Init(int x, int y) override;
-	bool RouteNav() override;
+	void RouteNav() override;
 	void Draw(HDC hdc) override;
 	void RouteDraw(HDC hdc) override;
 };

@@ -10,8 +10,11 @@ void GameManager::Init(HWND hWnd)
 	//배열에 이미지 경로 넣는 작업
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_tile1 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE1);
-	m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE2);
-	m_rBitMap = BitMapManager::GetInstance()->GetImage(IMAGE_MOVETILE);
+	//m_tile1 = BitMapManager::GetInstance()->GetImage(IMAGE_MOVETILE);
+    m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE2);
+	//m_tile2 = BitMapManager::GetInstance()->GetTestTile();
+	//m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_MOVETILE);
+	//m_rBitMap = BitMapManager::GetInstance()->GetTestTile();
 	InitBoard();
 	InitPiece();
 }
@@ -46,63 +49,70 @@ void GameManager::InitPiece()
 	//백색 폰
 	for (int i = 0; i < 8; i++)
 	{
-		Piece* p = new Pawn(i, 6, IMAGE_WHITE_PAWN);
+		Piece* p = new Pawn(i, 6, IMAGE_WHITE_PAWN, PIECE_COLOR_WHITE);
 		m_pieces[0][i] = p;
 	}
 	//흑색 폰
 	for (int i = 0; i < 8; i++)
 	{
-		Piece* p = new Pawn(i, 1, IMAGE_BLACK_PAWN);
+		Piece* p = new Pawn(i, 1, IMAGE_BLACK_PAWN, PIECE_COLOR_BLACK);
 		m_pieces[1][i] = p;
 	}
 
 	
 	//백색 루크
-	m_pieces[0][8] = new Rook(0, 7, IMAGE_WHITE_ROOK);
-	m_pieces[0][9] = new Rook(7, 7, IMAGE_WHITE_ROOK);
+	m_pieces[0][8] = new Rook(0, 7, IMAGE_WHITE_ROOK, PIECE_COLOR_WHITE);
+	m_pieces[0][9] = new Rook(7, 7, IMAGE_WHITE_ROOK, PIECE_COLOR_WHITE);
 	//흑색 루크
-	m_pieces[1][8] = new Rook(0, 0, IMAGE_BLACK_ROOK);
-	m_pieces[1][9] = new Rook(7, 0, IMAGE_BLACK_ROOK);
+	m_pieces[1][8] = new Rook(0, 0, IMAGE_BLACK_ROOK, PIECE_COLOR_BLACK);
+	m_pieces[1][9] = new Rook(7, 0, IMAGE_BLACK_ROOK, PIECE_COLOR_BLACK);
 	//백색 나이트
-	m_pieces[0][10] = new Knight(1, 7, IMAGE_WHITE_KNIGHT);
-	m_pieces[0][11] = new Knight(6, 7, IMAGE_WHITE_KNIGHT);
+	m_pieces[0][10] = new Knight(1, 7, IMAGE_WHITE_KNIGHT, PIECE_COLOR_WHITE);
+	m_pieces[0][11] = new Knight(6, 7, IMAGE_WHITE_KNIGHT, PIECE_COLOR_WHITE);
 	//흑색 나이트
-	m_pieces[1][10] = new Knight(1, 0, IMAGE_BLACK_KNIGHT);
-	m_pieces[1][11] = new Knight(6, 0, IMAGE_BLACK_KNIGHT);
+	m_pieces[1][10] = new Knight(1, 0, IMAGE_BLACK_KNIGHT, PIECE_COLOR_BLACK);
+	m_pieces[1][11] = new Knight(6, 0, IMAGE_BLACK_KNIGHT, PIECE_COLOR_BLACK);
 	//백색 비숍
-	m_pieces[0][12] = new Bishop(2, 7, IMAGE_WHITE_BISHOP);
-	m_pieces[0][13] = new Bishop(5, 7, IMAGE_WHITE_BISHOP);
+	m_pieces[0][12] = new Bishop(2, 7, IMAGE_WHITE_BISHOP, PIECE_COLOR_WHITE);
+	m_pieces[0][13] = new Bishop(5, 7, IMAGE_WHITE_BISHOP, PIECE_COLOR_WHITE);
 	//흑색 비숍
-	m_pieces[1][12] = new Bishop(2, 0, IMAGE_BLACK_BISHOP);
-	m_pieces[1][13] = new Bishop(5, 0, IMAGE_BLACK_BISHOP);
+	m_pieces[1][12] = new Bishop(2, 0, IMAGE_BLACK_BISHOP, PIECE_COLOR_BLACK);
+	m_pieces[1][13] = new Bishop(5, 0, IMAGE_BLACK_BISHOP, PIECE_COLOR_BLACK);
 	//백색 퀸과 킹
-	m_pieces[0][14] = new Queen(3, 7, IMAGE_WHITE_QUEEN);
-	m_pieces[0][15] = new King(4, 7, IMAGE_WHITE_KING);
+	m_pieces[0][14] = new Queen(3, 7, IMAGE_WHITE_QUEEN, PIECE_COLOR_WHITE);
+	m_pieces[0][15] = new King(4, 7, IMAGE_WHITE_KING, PIECE_COLOR_WHITE);
 	//흑색 퀸과 킹
-	m_pieces[1][14] = new Queen(3, 0, IMAGE_BLACK_QUEEN);
-	m_pieces[1][15] = new King(4, 0, IMAGE_BLACK_KING);
+	m_pieces[1][14] = new Queen(3, 0, IMAGE_BLACK_QUEEN, PIECE_COLOR_BLACK);
+	m_pieces[1][15] = new King(4, 0, IMAGE_BLACK_KING, PIECE_COLOR_BLACK);
 	
 }
 
 bool GameManager::CheckCollide(POINT point)
 {
-	/*for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 16; j++)(
+		for (int j = 0; j < 16; j++)
 		{
-			if (m_pieces[i][j] != nullptr && PtInRect(&m_pieces[i][j]->GetRect(), point))
+			//영역이 null이 아니며 클릭에 성공했을 경우
+			if (m_pieces[i][j] != nullptr && PtInRect(m_pieces[i][j]->GetRect(), point))
 			{
+				//해당 클래스의 경로탐색 작업 실행.
+				m_select = m_pieces[i][j];
+				m_select->RouteNav();
+				//InvalidateRect(m_hWnd, NULL, TRUE);
 				return true;
 			}
 		}
-	}*/
-
-	//1.잘 되는지 테스트부터->일단 화면 갱신은 됨
-	//SetPosition이용하여 좌표 이동시키고.
-	if (PtInRect(m_pieces[1][1]->GetRect(), point))
-	{
-		return true;
 	}
+
+	//백색 폰으로 테스트.
+	//
+	/*if (PtInRect(m_pieces[0][1]->GetRect(), point))
+	{
+		m_select = m_pieces[0][1];
+		m_select->RouteNav();
+		return true;
+	}*/
 
 	return false;
 }
@@ -132,6 +142,12 @@ void GameManager::Draw(HDC hdc)
 	}
 
 	PieceDraw(hdc);
+
+	if (m_select != nullptr)
+	{
+		m_select->RouteDraw(hdc);
+		//InvalidateRect(m_hWnd, NULL, TRUE);
+	}
 }
 
 void GameManager::PieceDraw(HDC hdc)
@@ -149,9 +165,37 @@ void GameManager::PieceDraw(HDC hdc)
 	}
 }
 
-void GameManager::RouteDraw(HDC hdc)
+//void GameManager::RouteDraw(HDC hdc)
+//{
+//	if (m_select != nullptr)
+//	{
+//		m_select->RouteDraw(hdc);
+//	}
+//}
+
+bool GameManager::CheckRoute(POINT point)
 {
-	
+	if (m_select == nullptr)
+		return false;
+
+	for (RECT r : m_select->GetRoute())
+	{
+		if (PtInRect(&r, point))
+		{
+			MovePiece(point);
+			return true;
+		}
+	}
+	return false;
+}
+
+void GameManager::MovePiece(POINT point)
+{
+	int newX = point.x / 75;
+	int newY = point.y / 75;
+
+	m_select->Init(newX, newY);
+	m_select = nullptr;
 }
 
 

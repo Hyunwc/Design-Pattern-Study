@@ -23,6 +23,15 @@ void BitMap::Draw(HDC hdc, int x, int y)
 	//StretchBlt(hdc, x, y, 75, 75, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
 }
 
+void BitMap::TestDraw(HDC hdc, int x, int y)
+{
+	BLENDFUNCTION bf;
+	ZeroMemory(&bf, sizeof(bf));
+	bf.SourceConstantAlpha = 100;
+	AlphaBlend(hdc, x, y, 75, 75, MemDC, 0, 0, m_Size.cx, m_Size.cy, bf);
+	//StretchBlt(hdc, x, y, 75, 75, MemDC, 0, 0, m_Size.cx, m_Size.cy, SRCCOPY);
+}
+
 BitMap::~BitMap()
 {
 	DeleteObject(m_BitMap);

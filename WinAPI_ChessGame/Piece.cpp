@@ -1,9 +1,9 @@
 #include "Piece.h"
 
-Piece::Piece(int x, int y, IMAGE index) : m_ix(x), m_iy(y)
+Piece::Piece(int x, int y, IMAGE index, PIECE_COLOR color) : m_ix(x), m_iy(y), m_color(color)
 {
 	m_pBitMap = BitMapManager::GetInstance()->GetImage(index);
-	m_rBitMap = BitMapManager::GetInstance()->GetImage(IMAGE_MOVETILE);
+	m_rBitMap = BitMapManager::GetInstance()->GetTestTile();
 	Init(x, y);
 }
 
@@ -13,6 +13,7 @@ void Piece::Init(int x, int y)
 	//영역은 여기있는 것들 그대로 사용할 것.
 	//m_imageIndex = Index;
 	//m_pBitMap = BitMapManager::GetInstance()->GetImage(Index);
+	
 	m_ix = x;
 	m_iy = y;
 	//m_pos.m_ix = x;
