@@ -15,9 +15,9 @@ void King::Draw(HDC hdc)
 	m_pBitMap->Draw(hdc, m_rect.left, m_rect.top);
 }
 
-void King::RouteNav()
+vector<RECT> King::RouteNav()
 {
-	m_route.clear();
+	vector<RECT> m_route;
 
 	int moves[8][2] = {
 		{ -1, -1 }, { -1, 0}, {-1, 1}, {0, -1},
@@ -37,11 +37,13 @@ void King::RouteNav()
 			m_route.push_back(route);
 		}
 	}
+
+	return m_route;
 }
 
 void King::RouteDraw(HDC hdc)
 {
-	for (RECT r : m_route)
+	for (RECT r : RouteNav())
 	{
 		m_rBitMap->TestDraw(hdc, r.left, r.top);
 	}

@@ -26,6 +26,11 @@ void Piece::Init(int x, int y)
 	//m_rect.bottom = m_rect.top + m_pBitMap->GetSize().cy;
 }
 
+bool Piece::IsMoveable(RECT rect)
+{
+	return false;
+}
+
 
 //void Pawn::Init(int x, int y)
 //{

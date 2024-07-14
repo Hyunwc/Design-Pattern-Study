@@ -15,9 +15,9 @@ void Queen::Draw(HDC hdc)
 	m_pBitMap->Draw(hdc, m_rect.left, m_rect.top);
 }
 
-void Queen::RouteNav()
+vector<RECT> Queen::RouteNav()
 {
-	m_route.clear();
+	vector<RECT> m_route;
 
 	int moves[4][2] = {
 		{ -1, -1}, { -1, 1}, {1, -1}, {1, 1}
@@ -64,11 +64,13 @@ void Queen::RouteNav()
 			}
 		}
 	}
+
+	return m_route;
 }
 
 void Queen::RouteDraw(HDC hdc)
 {
-	for (RECT r : m_route)
+	for (RECT r : RouteNav())
 	{
 		m_rBitMap->TestDraw(hdc, r.left, r.top);
 	}

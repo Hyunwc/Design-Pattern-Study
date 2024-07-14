@@ -16,9 +16,9 @@ void Bishop::Draw(HDC hdc)
 	m_pBitMap->Draw(hdc, m_rect.left, m_rect.top);
 }
 
-void Bishop::RouteNav()
+vector<RECT> Bishop::RouteNav()
 {
-	m_route.clear();
+	vector<RECT> m_route;
 	
 	int moves[4][2] = {
 		{ -1, -1}, { -1, 1}, {1, -1}, {1, 1} 
@@ -46,12 +46,14 @@ void Bishop::RouteNav()
 			}
 		}
 	}
+
+	return m_route;
 }
 
 void Bishop::RouteDraw(HDC hdc)
 {
 
-	for (RECT r : m_route)
+	for (RECT r : RouteNav())
 	{
 		m_rBitMap->TestDraw(hdc, r.left, r.top);
 	}

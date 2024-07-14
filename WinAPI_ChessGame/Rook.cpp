@@ -15,9 +15,9 @@ void Rook::Draw(HDC hdc)
 	m_pBitMap->Draw(hdc, m_rect.left, m_rect.top);
 }
 
-void Rook::RouteNav()
+vector<RECT> Rook::RouteNav()
 {
-	m_route.clear();
+	vector<RECT> m_route;
 	//¼öÁ÷
 	for (int i = 0; i < 8; i++)
 	{
@@ -37,11 +37,12 @@ void Rook::RouteNav()
 		}
 	}
 	
+	return m_route;
 }
 
 void Rook::RouteDraw(HDC hdc)
 {
-	for (RECT r : m_route)
+	for (RECT r : RouteNav())
 	{
 		m_rBitMap->TestDraw(hdc, r.left, r.top);
 	}

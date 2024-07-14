@@ -28,6 +28,7 @@ private:
 	HWND m_hWnd;
 	HDC m_hdc;
 	RECT m_board[8][8]; //타일의 영역
+	PIECE_COLOR m_colors[8][8]; 
 	bool isMove;
 	//흑과 백을 담을 2개의 벡터를 길이가2인 m_pieces라는 벡터에게 할당
 	vector<Piece*> m_pieces[2] = { vector<Piece*>(16, nullptr), vector<Piece*>(16, nullptr) };
@@ -63,4 +64,7 @@ public:
 	//테스트용
 	bool CheckRoute(POINT point);
 	void MovePiece(POINT point);
+
+	PIECE_COLOR GetPieceColor(RECT rect);
+	
 };

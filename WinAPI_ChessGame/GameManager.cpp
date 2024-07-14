@@ -37,7 +37,9 @@ void GameManager::InitBoard()
 			m_board[i][j].top = y;
 			m_board[i][j].right = x + TILE_SIZE;
 			m_board[i][j].bottom = y + TILE_SIZE;
+			m_colors[i][j] = PIECE_COLOR_NONE;
 			x += TILE_SIZE;
+
 		}
 		x = XSTART;
 		y += TILE_SIZE;
@@ -51,39 +53,58 @@ void GameManager::InitPiece()
 	{
 		Piece* p = new Pawn(i, 6, IMAGE_WHITE_PAWN, PIECE_COLOR_WHITE);
 		m_pieces[0][i] = p;
+		m_colors[0][i] = PIECE_COLOR_WHITE;
 	}
 	//Èæ»ö Æù
 	for (int i = 0; i < 8; i++)
 	{
 		Piece* p = new Pawn(i, 1, IMAGE_BLACK_PAWN, PIECE_COLOR_BLACK);
 		m_pieces[1][i] = p;
+		m_colors[1][i] = PIECE_COLOR_BLACK;
 	}
 
 	
 	//¹é»ö ·çÅ©
 	m_pieces[0][8] = new Rook(0, 7, IMAGE_WHITE_ROOK, PIECE_COLOR_WHITE);
 	m_pieces[0][9] = new Rook(7, 7, IMAGE_WHITE_ROOK, PIECE_COLOR_WHITE);
+	m_colors[7][0] = PIECE_COLOR_WHITE;
+	m_colors[7][7] = PIECE_COLOR_WHITE;
+
 	//Èæ»ö ·çÅ©
 	m_pieces[1][8] = new Rook(0, 0, IMAGE_BLACK_ROOK, PIECE_COLOR_BLACK);
 	m_pieces[1][9] = new Rook(7, 0, IMAGE_BLACK_ROOK, PIECE_COLOR_BLACK);
+	m_colors[0][0] = PIECE_COLOR_BLACK;
+	m_colors[0][7] = PIECE_COLOR_BLACK;
 	//¹é»ö ³ªÀÌÆ®
 	m_pieces[0][10] = new Knight(1, 7, IMAGE_WHITE_KNIGHT, PIECE_COLOR_WHITE);
 	m_pieces[0][11] = new Knight(6, 7, IMAGE_WHITE_KNIGHT, PIECE_COLOR_WHITE);
+	m_colors[7][1] = PIECE_COLOR_WHITE;
+	m_colors[7][6] = PIECE_COLOR_WHITE;
 	//Èæ»ö ³ªÀÌÆ®
 	m_pieces[1][10] = new Knight(1, 0, IMAGE_BLACK_KNIGHT, PIECE_COLOR_BLACK);
 	m_pieces[1][11] = new Knight(6, 0, IMAGE_BLACK_KNIGHT, PIECE_COLOR_BLACK);
+	m_colors[0][1] = PIECE_COLOR_BLACK;
+	m_colors[0][6] = PIECE_COLOR_BLACK;
 	//¹é»ö ºñ¼ó
 	m_pieces[0][12] = new Bishop(2, 7, IMAGE_WHITE_BISHOP, PIECE_COLOR_WHITE);
 	m_pieces[0][13] = new Bishop(5, 7, IMAGE_WHITE_BISHOP, PIECE_COLOR_WHITE);
+	m_colors[7][2] = PIECE_COLOR_WHITE;
+	m_colors[7][5] = PIECE_COLOR_WHITE;
 	//Èæ»ö ºñ¼ó
 	m_pieces[1][12] = new Bishop(2, 0, IMAGE_BLACK_BISHOP, PIECE_COLOR_BLACK);
 	m_pieces[1][13] = new Bishop(5, 0, IMAGE_BLACK_BISHOP, PIECE_COLOR_BLACK);
+	m_colors[0][2] = PIECE_COLOR_BLACK;
+	m_colors[0][5] = PIECE_COLOR_BLACK;
 	//¹é»ö Äý°ú Å·
 	m_pieces[0][14] = new Queen(3, 7, IMAGE_WHITE_QUEEN, PIECE_COLOR_WHITE);
 	m_pieces[0][15] = new King(4, 7, IMAGE_WHITE_KING, PIECE_COLOR_WHITE);
+	m_colors[7][3] = PIECE_COLOR_WHITE;
+	m_colors[7][4] = PIECE_COLOR_WHITE;
 	//Èæ»ö Äý°ú Å·
 	m_pieces[1][14] = new Queen(3, 0, IMAGE_BLACK_QUEEN, PIECE_COLOR_BLACK);
 	m_pieces[1][15] = new King(4, 0, IMAGE_BLACK_KING, PIECE_COLOR_BLACK);
+	m_colors[0][3] = PIECE_COLOR_BLACK;
+	m_colors[0][4] = PIECE_COLOR_BLACK;
 	
 }
 
@@ -178,7 +199,7 @@ bool GameManager::CheckRoute(POINT point)
 	if (m_select == nullptr)
 		return false;
 
-	for (RECT r : m_select->GetRoute())
+	for (RECT r : m_select->RouteNav())
 	{
 		if (PtInRect(&r, point))
 		{
@@ -191,11 +212,30 @@ bool GameManager::CheckRoute(POINT point)
 
 void GameManager::MovePiece(POINT point)
 {
+	int oldX = m_select->GetPosX();
+	int oldY = m_select->GetPosY();
 	int newX = point.x / 75;
 	int newY = point.y / 75;
 
 	m_select->Init(newX, newY);
+	m_colors[oldY][oldX] = PIECE_COLOR_NONE;
+	m_colors[newY][newX] = m_select->GetColor();
 	m_select = nullptr;
+}
+
+PIECE_COLOR GameManager::GetPieceColor(RECT rect)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (m_board[i][j].left == rect.left && m_board[i][j].top == rect.top)
+			{
+				return m_colors[i][j];
+			}
+		}
+	}
+	return PIECE_COLOR_NONE;
 }
 
 

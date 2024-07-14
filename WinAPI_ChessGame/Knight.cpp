@@ -7,7 +7,6 @@ Knight::Knight(int x, int y, IMAGE index, PIECE_COLOR color) : Piece(x, y, index
 
 void Knight::Init(int x, int y)
 {
-	m_route.clear();
 	Piece::Init(x, y);
 }
 
@@ -16,9 +15,9 @@ void Knight::Draw(HDC hdc)
 	m_pBitMap->Draw(hdc, m_rect.left, m_rect.top);
 }
 
-void Knight::RouteNav()
+vector<RECT> Knight::RouteNav()
 {
-	m_route.clear();
+	vector<RECT> m_route;
 	
 	int moves[8][2] = {
 		{ -1, -2 }, { -1, 2}, {1, -2}, {1, 2},
@@ -38,12 +37,12 @@ void Knight::RouteNav()
 		}
 	}
 	
-	
+	return m_route;
 }
 
 void Knight::RouteDraw(HDC hdc)
 {
-	for (RECT r : m_route)
+	for (RECT r : RouteNav())
 	{
 		m_rBitMap->TestDraw(hdc, r.left, r.top);
 	}
@@ -59,6 +58,6 @@ void Knight::Test(RECT temp, int w, int h)
 	test.right = test.left + 75;
 	test.bottom = test.top + 75;
 
-	m_route.push_back(test);
+	//m_route.push_back(test);
 	
 }
