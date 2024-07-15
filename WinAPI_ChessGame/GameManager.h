@@ -30,10 +30,11 @@ private:
 	RECT m_board[8][8]; //타일의 영역
 	PIECE_COLOR m_colors[8][8]; 
 	bool isMove;
+	bool isWhiteTurn;
 	//흑과 백을 담을 2개의 벡터를 길이가2인 m_pieces라는 벡터에게 할당
 	vector<Piece*> m_pieces[2] = { vector<Piece*>(16, nullptr), vector<Piece*>(16, nullptr) };
 	Piece* m_select = nullptr;
-	GameManager() : isMove(false) {}
+	GameManager() : isMove(false), isWhiteTurn(true) {}
 public:
 	~GameManager();
 	static GameManager* Instance()
@@ -51,7 +52,6 @@ public:
 		}
 	}
 
-
 	void Init(HWND hWnd);
 	void InitBoard(); //보드 초기화
 	void InitPiece(); //말 초기화
@@ -59,11 +59,11 @@ public:
 
 	void Draw(HDC hdc);
 	void PieceDraw(HDC hdc);
-	//void RouteDraw(HDC hdc);
-
-	//테스트용
+	
 	bool CheckRoute(POINT point);
 	void MovePiece(POINT point);
+	void RemovePiece(int x, int y);
+	bool KillPiece(POINT point);
 
 	PIECE_COLOR GetPieceColor(RECT rect);
 	

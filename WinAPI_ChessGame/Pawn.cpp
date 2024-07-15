@@ -19,34 +19,53 @@ vector<RECT> Pawn::RouteNav()
 	vector<RECT> m_route;
 	RECT route = m_rect;
 
+	//폰이 백색인지 흑색인지에 따라 방향 설정
+	int direction = (m_color == PIECE_COLOR_WHITE) ? -1 : 1;
+
 	//한칸 이동
-	route.top -= 75;
-	route.bottom -= 75;
-	if(IsMoveable(route)) m_route.push_back(route);
-	//앞에 장애물이 있든 말든 무시. 일단 백으로 테스트.
-	//
+	route.top += direction * 75;
+	route.bottom += direction * 75;
+	if (IsMoveable(route))
+	{
+		m_route.push_back(route);
+	}
+	
+	//첫 이동시 두칸 전진 가능
 	if (firstMove)
 	{
-		route.top -= 75;
-		route.bottom -= 75;
-		if (IsMoveable(route)) m_route.push_back(route);
+		RECT twoStep = { route.left, route.top + direction * 75 , route.right, route.bottom + direction * 75 };
+		if (IsMoveable(twoStep))
+		{
+			m_route.push_back(twoStep);
+		}
 	}
 
 	//이제 대각선 위치에 적이 있다면 대각선으로 이동 가능하게 수정 해야함.
 	//왼쪽 대각선과 오른쪽 대각선
 	int leftDiagonalX = m_ix - 1; 
 	int rightDiagonalX = m_ix + 1;
-	int diagonalY = m_iy - 1;
+	int diagonalY = m_iy + direction;
 
+	//왼쪽 대각선
 	if (leftDiagonalX >= 0 && leftDiagonalX < 8 && diagonalY >= 0 && diagonalY < 8)
 	{
 		RECT l_diagonal = { leftDiagonalX * 75, diagonalY * 75, (leftDiagonalX + 1) * 75, (diagonalY + 1) * 75 };
-		if (IsMoveable(route)) m_route.push_back(l_diagonal);
+		//컬러에 왼쪽 대각선 영역에 어떤 색깔이 들어있는지 삽입
+		//PIECE_COLOR color = GameManager::Instance()->GetPieceColor(l_diagonal);
+		//왼쪽 영역이 NONE이 아니면서 현재 자신의 색과 다르다면(적이라는 것) 삽입
+		if (IsEnemy(l_diagonal))
+		{
+			m_route.push_back(l_diagonal);
+		}
+			
 	}
+	//오른쪽 대각선
 	if (rightDiagonalX >= 0 && rightDiagonalX < 8 && diagonalY >= 0 && diagonalY < 8)
 	{
 		RECT r_diagonal = { rightDiagonalX * 75, diagonalY * 75, (rightDiagonalX + 1) * 75, (diagonalY + 1) * 75 };
-		if (IsMoveable(route)) m_route.push_back(r_diagonal);
+		//PIECE_COLOR color = GameManager::Instance()->GetPieceColor(r_diagonal);
+		if (IsEnemy(r_diagonal))
+			m_route.push_back(r_diagonal);
 	}
 
 	if (firstMove)
@@ -73,8 +92,15 @@ void Pawn::RouteDraw(HDC hdc)
 
 bool Pawn::IsMoveable(RECT rect)
 {
+	//매개변수 rect(말이 이동할 영역)의 컬러가 None이면 true
 	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
 	return (color == PIECE_COLOR_NONE);
+}
+
+bool Pawn::IsEnemy(RECT rect)
+{
+	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
+	return (color != PIECE_COLOR_NONE && color != m_color);
 }
 
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Piece.h"
+#include "GameManager.h"
 
 class Knight : public Piece
 {
@@ -9,5 +10,6 @@ public:
 	void Draw(HDC hdc) override;
 	vector<RECT> RouteNav() override;
 	void RouteDraw(HDC hdc) override;
+	bool IsMoveable(RECT rect) override;
 	void Test(RECT temp, int w, int h);
 };

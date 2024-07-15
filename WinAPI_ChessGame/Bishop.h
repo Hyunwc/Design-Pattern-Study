@@ -1,5 +1,6 @@
 #pragma once
 #include "Piece.h"
+#include "GameManager.h"
 
 class Bishop : public Piece
 {
@@ -9,4 +10,5 @@ public:
 	void Draw(HDC hdc) override;
 	vector<RECT> RouteNav() override;
 	void RouteDraw(HDC hdc) override;
+	bool IsMoveable(RECT rect) override;
 };

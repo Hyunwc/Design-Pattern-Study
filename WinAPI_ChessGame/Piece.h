@@ -2,6 +2,7 @@
 #include "Mecro.h"
 #include "BitMap.h"
 #include "BitMapManager.h"
+//#include "GameManager.h"
 
 
 
@@ -31,5 +32,6 @@ public:
 	virtual void Draw(HDC hdc) = 0;
 	virtual void RouteDraw(HDC hdc){}
 	virtual bool IsMoveable(RECT rect);
+	virtual bool IsEnemy(RECT rect) { return false; }
 	virtual ~Piece() {}
 };

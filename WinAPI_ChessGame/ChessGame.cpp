@@ -134,7 +134,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_LBUTTONDOWN:
         Point.x = LOWORD(lParam);
         Point.y = HIWORD(lParam);
-        if (GameManager::Instance()->CheckCollide(Point) || GameManager::Instance()->CheckRoute(Point))
+        if (GameManager::Instance()->CheckCollide(Point) || GameManager::Instance()->CheckRoute(Point) || GameManager::Instance()->KillPiece(Point))
         {
             InvalidateRect(hWnd, NULL, TRUE); // 화면 갱신
         }

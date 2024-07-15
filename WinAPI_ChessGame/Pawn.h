@@ -12,5 +12,6 @@ public:
 	void Draw(HDC hdc) override;
 	void RouteDraw(HDC hdc) override;
 	bool IsMoveable(RECT rect) override;
-
+	bool IsEnemy(RECT rect);
+	//~Pawn(){ GameManager::Release(); }
 };

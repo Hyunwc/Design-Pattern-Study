@@ -23,23 +23,30 @@ vector<RECT> Queen::RouteNav()
 		{ -1, -1}, { -1, 1}, {1, -1}, {1, 1}
 	};
 
-	//수직
-	for (int i = 0; i < 8; i++)
+	for (int i = m_iy - 1; i >= 0; i--)
 	{
-		if (i != m_iy)
-		{
-			RECT route = { m_ix * 75, i * 75, (m_ix + 1) * 75, (i + 1) * 75 };
-			m_route.push_back(route);
-		}
+		RECT route = { m_ix * 75, i * 75, (m_ix + 1) * 75, (i + 1) * 75 };
+		if (!IsMoveable(route)) break;
+		m_route.push_back(route);
+	}
+	for (int i = m_iy + 1; i < 8; i++)
+	{
+		RECT route = { m_ix * 75, i * 75, (m_ix + 1) * 75, (i + 1) * 75 };
+		if (!IsMoveable(route)) break;
+		m_route.push_back(route);
 	}
 	//수평
-	for (int i = 0; i < 8; i++)
+	for (int i = m_ix - 1; i >= 0; i--)
 	{
-		if (i != m_ix)
-		{
-			RECT route = { i * 75, m_iy * 75, (i + 1) * 75, (m_iy + 1) * 75 };
-			m_route.push_back(route);
-		}
+		RECT route = { i * 75, m_iy * 75, (i + 1) * 75, (m_iy + 1) * 75 };
+		if (!IsMoveable(route)) break;
+		m_route.push_back(route);
+	}
+	for (int i = m_ix + 1; i < 8; i++)
+	{
+		RECT route = { i * 75, m_iy * 75, (i + 1) * 75, (m_iy + 1) * 75 };
+		if (!IsMoveable(route)) break;
+		m_route.push_back(route);
 	}
 
 	for (int i = 0; i < 4; i++)
@@ -56,7 +63,10 @@ vector<RECT> Queen::RouteNav()
 			if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8)
 			{
 				RECT route = { newX * 75, newY * 75, (newX + 1) * 75, (newY + 1) * 75 };
-				m_route.push_back(route);
+				if (IsMoveable(route))
+					m_route.push_back(route);
+				else
+					break;
 			}
 			else
 			{
@@ -74,4 +84,10 @@ void Queen::RouteDraw(HDC hdc)
 	{
 		m_rBitMap->TestDraw(hdc, r.left, r.top);
 	}
+}
+
+bool Queen::IsMoveable(RECT rect)
+{
+	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
+	return (color == PIECE_COLOR_NONE || color != m_color);
 }

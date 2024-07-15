@@ -38,7 +38,14 @@ vector<RECT> Bishop::RouteNav()
 			if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8)
 			{
 				RECT route = { newX * 75, newY * 75, (newX + 1) * 75, (newY + 1) * 75 };
-				m_route.push_back(route);
+				if (IsMoveable(route))
+				{
+					m_route.push_back(route);
+				}
+				else
+				{
+					break;
+				}
 			}
 			else
 			{
@@ -57,4 +64,10 @@ void Bishop::RouteDraw(HDC hdc)
 	{
 		m_rBitMap->TestDraw(hdc, r.left, r.top);
 	}
+}
+
+bool Bishop::IsMoveable(RECT rect)
+{
+	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
+	return (color == PIECE_COLOR_NONE || color != m_color);
 }

@@ -53,7 +53,7 @@ void GameManager::InitPiece()
 	{
 		Piece* p = new Pawn(i, 6, IMAGE_WHITE_PAWN, PIECE_COLOR_WHITE);
 		m_pieces[0][i] = p;
-		m_colors[0][i] = PIECE_COLOR_WHITE;
+		m_colors[6][i] = PIECE_COLOR_WHITE;
 	}
 	//흑색 폰
 	for (int i = 0; i < 8; i++)
@@ -115,25 +115,17 @@ bool GameManager::CheckCollide(POINT point)
 		for (int j = 0; j < 16; j++)
 		{
 			//영역이 null이 아니며 클릭에 성공했을 경우
+		
 			if (m_pieces[i][j] != nullptr && PtInRect(m_pieces[i][j]->GetRect(), point))
 			{
 				//해당 클래스의 경로탐색 작업 실행.
 				m_select = m_pieces[i][j];
 				m_select->RouteNav();
-				//InvalidateRect(m_hWnd, NULL, TRUE);
+			
 				return true;
 			}
 		}
 	}
-
-	//백색 폰으로 테스트.
-	//
-	/*if (PtInRect(m_pieces[0][1]->GetRect(), point))
-	{
-		m_select = m_pieces[0][1];
-		m_select->RouteNav();
-		return true;
-	}*/
 
 	return false;
 }
@@ -186,14 +178,6 @@ void GameManager::PieceDraw(HDC hdc)
 	}
 }
 
-//void GameManager::RouteDraw(HDC hdc)
-//{
-//	if (m_select != nullptr)
-//	{
-//		m_select->RouteDraw(hdc);
-//	}
-//}
-
 bool GameManager::CheckRoute(POINT point)
 {
 	if (m_select == nullptr)
@@ -212,19 +196,55 @@ bool GameManager::CheckRoute(POINT point)
 
 void GameManager::MovePiece(POINT point)
 {
+	////이전좌표 x,y는 현재로 저장 후 좌표 변경
+	//int oldX = m_select->GetPosX();
+	//int oldY = m_select->GetPosY();
+	//int newX = point.x / 75;
+	//int newY = point.y / 75;
+
+	//m_select->Init(newX, newY);
+	//m_colors[oldY][oldX] = PIECE_COLOR_NONE;
+	//m_colors[newY][newX] = m_select->GetColor();
+	//m_select = nullptr;
+	
+	//이전좌표 x,y는 현재로 저장 후 좌표 변경
 	int oldX = m_select->GetPosX();
 	int oldY = m_select->GetPosY();
 	int newX = point.x / 75;
 	int newY = point.y / 75;
 
+	//다음 좌표에 저장된 색이 NONE이 아니면서 
+	//현재 자기와 같은 색깔이 아닐 경우
+	if (m_colors[newY][newX] != PIECE_COLOR_NONE && m_colors[newY][newX] != m_select->GetColor())
+	{
+		
+		//RemovePiece(newX, newY);
+		//remove(m_pieces->begin(), m_pieces->end(), m_pieces[newY][newX]);
+	}
+
+	//좌표 이동 
 	m_select->Init(newX, newY);
+	//이전좌표공간 None으로 
 	m_colors[oldY][oldX] = PIECE_COLOR_NONE;
+	//새로운좌표공간은 그 객체의 색으로
 	m_colors[newY][newX] = m_select->GetColor();
 	m_select = nullptr;
 }
 
+void GameManager::RemovePiece(int x, int y)
+{
+
+}
+
+bool GameManager::KillPiece(POINT point)
+{
+	
+	return false;
+}
+
 PIECE_COLOR GameManager::GetPieceColor(RECT rect)
 {
+	//이동할 경로의 영역과 같다면 그 영역의 색깔 반환
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
@@ -235,6 +255,7 @@ PIECE_COLOR GameManager::GetPieceColor(RECT rect)
 			}
 		}
 	}
+	//없으면 None반환
 	return PIECE_COLOR_NONE;
 }
 
