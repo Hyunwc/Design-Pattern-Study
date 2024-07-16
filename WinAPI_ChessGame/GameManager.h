@@ -15,8 +15,6 @@
 #define YSTART 0
 #define TILE_SIZE 75
 
-
-
 class GameManager
 {
 private:
@@ -31,10 +29,11 @@ private:
 	PIECE_COLOR m_colors[8][8]; 
 	bool isMove;
 	bool isWhiteTurn;
+	PIECE_COLOR m_turn;
 	//흑과 백을 담을 2개의 벡터를 길이가2인 m_pieces라는 벡터에게 할당
 	vector<Piece*> m_pieces[2] = { vector<Piece*>(16, nullptr), vector<Piece*>(16, nullptr) };
 	Piece* m_select = nullptr;
-	GameManager() : isMove(false), isWhiteTurn(true) {}
+	GameManager() : isMove(false), isWhiteTurn(true), m_turn(PIECE_COLOR_WHITE) {}
 public:
 	~GameManager();
 	static GameManager* Instance()
@@ -64,6 +63,7 @@ public:
 	void MovePiece(POINT point);
 	void RemovePiece(int x, int y);
 	bool KillPiece(POINT point);
+	void TurnChange();
 
 	PIECE_COLOR GetPieceColor(RECT rect);
 	

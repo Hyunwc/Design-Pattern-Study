@@ -50,6 +50,7 @@ void Knight::RouteDraw(HDC hdc)
 
 bool Knight::IsMoveable(RECT rect)
 {
+	//이동할 영역이 None이면서 자기 영역이 아닐때
 	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
 	return (color == PIECE_COLOR_NONE || color != m_color);
 }

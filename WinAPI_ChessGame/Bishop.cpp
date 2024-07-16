@@ -41,6 +41,7 @@ vector<RECT> Bishop::RouteNav()
 				if (IsMoveable(route))
 				{
 					m_route.push_back(route);
+					if (IsEnemy(route)) break;
 				}
 				else
 				{
@@ -70,4 +71,11 @@ bool Bishop::IsMoveable(RECT rect)
 {
 	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
 	return (color == PIECE_COLOR_NONE || color != m_color);
+}
+
+bool Bishop::IsEnemy(RECT rect)
+{
+	//이동할 영역이 상대방이라면 true
+	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
+	return (color != m_color && color != PIECE_COLOR_NONE);
 }

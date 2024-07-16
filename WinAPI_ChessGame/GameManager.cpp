@@ -112,17 +112,21 @@ bool GameManager::CheckCollide(POINT point)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 16; j++)
+		for (int j = 0; j < m_pieces[i].size(); j++)
 		{
 			//영역이 null이 아니며 클릭에 성공했을 경우
 		
 			if (m_pieces[i][j] != nullptr && PtInRect(m_pieces[i][j]->GetRect(), point))
 			{
-				//해당 클래스의 경로탐색 작업 실행.
-				m_select = m_pieces[i][j];
-				m_select->RouteNav();
-			
-				return true;
+				if (m_pieces[i][j]->GetColor() == m_turn)
+				{
+					//해당 클래스의 경로탐색 작업 실행.
+					m_select = m_pieces[i][j];
+					m_select->RouteNav();
+
+					return true;
+				}
+				
 			}
 		}
 	}
@@ -155,7 +159,17 @@ void GameManager::Draw(HDC hdc)
 	}
 
 	PieceDraw(hdc);
+	if (m_turn == PIECE_COLOR_WHITE)
+		TextOutA(hdc, 250, 620, "WhiteTurn", 9);
+	else
+		TextOutA(hdc, 250, 620, "BlackTurn", 9);
 
+	char w_buf[256];
+	char b_buf[256];
+	sprintf_s(w_buf, "w_size : %d", m_pieces[0].size());
+	sprintf_s(b_buf, "b_size : %d", m_pieces[1].size());
+	TextOutA(hdc, 10, 620, w_buf, strlen(w_buf));
+	TextOutA(hdc, 10, 640, b_buf, strlen(b_buf));
 	if (m_select != nullptr)
 	{
 		m_select->RouteDraw(hdc);
@@ -188,6 +202,8 @@ bool GameManager::CheckRoute(POINT point)
 		if (PtInRect(&r, point))
 		{
 			MovePiece(point);
+			//이동 후 턴 체인지
+			TurnChange();
 			return true;
 		}
 	}
@@ -215,11 +231,23 @@ void GameManager::MovePiece(POINT point)
 
 	//다음 좌표에 저장된 색이 NONE이 아니면서 
 	//현재 자기와 같은 색깔이 아닐 경우
-	if (m_colors[newY][newX] != PIECE_COLOR_NONE && m_colors[newY][newX] != m_select->GetColor())
+	if (m_colors[newY][newX] != PIECE_COLOR_NONE)
 	{
-		
-		//RemovePiece(newX, newY);
-		//remove(m_pieces->begin(), m_pieces->end(), m_pieces[newY][newX]);
+		for (int i = 0; i < 2; i++)
+		{
+			for (auto iter = m_pieces[i].begin(); iter != m_pieces[i].end(); iter++)
+			{
+				if ((*iter)->GetPosX() == newX && (*iter)->GetPosY() == newY)
+				{
+					delete *iter;
+				    m_pieces[i].erase(iter);
+					break;
+				}
+
+			}
+			
+		}
+		m_colors[newY][newX] = PIECE_COLOR_NONE;
 	}
 
 	//좌표 이동 
@@ -240,6 +268,12 @@ bool GameManager::KillPiece(POINT point)
 {
 	
 	return false;
+}
+
+void GameManager::TurnChange()
+{
+	//화이트 턴이면 블랙으로 아니면 화이트로
+	m_turn = (m_turn == PIECE_COLOR_WHITE) ? PIECE_COLOR_BLACK : PIECE_COLOR_WHITE;
 }
 
 PIECE_COLOR GameManager::GetPieceColor(RECT rect)
@@ -265,7 +299,7 @@ GameManager::~GameManager()
 	DeleteDC(m_hdc);
 	for (int i = 0; i < 2; ++i)
 	{
-		for (int j = 0; j < 16; ++j)
+		for (int j = 0; j < m_pieces[i].size(); ++j)
 		{
 			delete m_pieces[i][j];
 		}
