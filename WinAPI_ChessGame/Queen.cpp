@@ -28,12 +28,14 @@ vector<RECT> Queen::RouteNav()
 		RECT route = { m_ix * 75, i * 75, (m_ix + 1) * 75, (i + 1) * 75 };
 		if (!IsMoveable(route)) break;
 		m_route.push_back(route);
+		if (IsEnemy(route)) break;
 	}
 	for (int i = m_iy + 1; i < 8; i++)
 	{
 		RECT route = { m_ix * 75, i * 75, (m_ix + 1) * 75, (i + 1) * 75 };
 		if (!IsMoveable(route)) break;
 		m_route.push_back(route);
+		if (IsEnemy(route)) break;
 	}
 	//수평
 	for (int i = m_ix - 1; i >= 0; i--)
@@ -41,12 +43,14 @@ vector<RECT> Queen::RouteNav()
 		RECT route = { i * 75, m_iy * 75, (i + 1) * 75, (m_iy + 1) * 75 };
 		if (!IsMoveable(route)) break;
 		m_route.push_back(route);
+		if (IsEnemy(route)) break;
 	}
 	for (int i = m_ix + 1; i < 8; i++)
 	{
 		RECT route = { i * 75, m_iy * 75, (i + 1) * 75, (m_iy + 1) * 75 };
 		if (!IsMoveable(route)) break;
 		m_route.push_back(route);
+		if (IsEnemy(route)) break;
 	}
 
 	for (int i = 0; i < 4; i++)
@@ -64,9 +68,14 @@ vector<RECT> Queen::RouteNav()
 			{
 				RECT route = { newX * 75, newY * 75, (newX + 1) * 75, (newY + 1) * 75 };
 				if (IsMoveable(route))
+				{
 					m_route.push_back(route);
+					if (IsEnemy(route)) break;
+				}
 				else
+				{
 					break;
+				}
 			}
 			else
 			{
@@ -90,4 +99,11 @@ bool Queen::IsMoveable(RECT rect)
 {
 	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
 	return (color == PIECE_COLOR_NONE || color != m_color);
+}
+
+bool Queen::IsEnemy(RECT rect)
+{
+	//이동할 영역이 상대방이라면 true
+	PIECE_COLOR color = GameManager::Instance()->GetPieceColor(rect);
+	return (color != m_color && color != PIECE_COLOR_NONE);
 }

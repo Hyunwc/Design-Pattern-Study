@@ -11,4 +11,5 @@ public:
 	vector<RECT> RouteNav() override;
 	void RouteDraw(HDC hdc) override;
 	bool IsMoveable(RECT rect) override;
+	bool IsEnemy(RECT rect) override;
 };

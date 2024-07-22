@@ -7,6 +7,7 @@
 #include "Bishop.h"
 #include "Queen.h"
 #include "King.h"
+#include <string>
 
 #pragma comment(lib, "msimg32.lib") //TransparentBlt() 함수를 사용하기 위한 라이브러리
 
@@ -15,6 +16,12 @@
 #define YSTART 0
 #define TILE_SIZE 75
 
+enum GameState
+{
+	Main,
+	GamePlay,
+	GameEnd
+};
 class GameManager
 {
 private:
@@ -27,13 +34,18 @@ private:
 	HDC m_hdc;
 	RECT m_board[8][8]; //타일의 영역
 	PIECE_COLOR m_colors[8][8]; 
+	GameState m_state;
+	RECT startRect, endRect;
 	bool isMove;
 	bool isWhiteTurn;
+	int winner;
+	wstring winstr;
+	bool isOver;
 	PIECE_COLOR m_turn;
 	//흑과 백을 담을 2개의 벡터를 길이가2인 m_pieces라는 벡터에게 할당
 	vector<Piece*> m_pieces[2] = { vector<Piece*>(16, nullptr), vector<Piece*>(16, nullptr) };
 	Piece* m_select = nullptr;
-	GameManager() : isMove(false), isWhiteTurn(true), m_turn(PIECE_COLOR_WHITE) {}
+	GameManager() : isMove(false), isWhiteTurn(true), isOver(false), m_turn(PIECE_COLOR_WHITE) {}
 public:
 	~GameManager();
 	static GameManager* Instance()
@@ -64,6 +76,7 @@ public:
 	void RemovePiece(int x, int y);
 	bool KillPiece(POINT point);
 	void TurnChange();
+	void Promotion(int x, int y);
 
 	PIECE_COLOR GetPieceColor(RECT rect);
 	

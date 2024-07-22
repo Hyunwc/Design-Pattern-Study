@@ -4,6 +4,7 @@ Piece::Piece(int x, int y, IMAGE index, PIECE_COLOR color) : m_ix(x), m_iy(y), m
 {
 	m_pBitMap = BitMapManager::GetInstance()->GetImage(index);
 	m_rBitMap = BitMapManager::GetInstance()->GetTestTile();
+	m_imageIndex = index;
 	Init(x, y);
 }
 

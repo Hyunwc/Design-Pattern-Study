@@ -25,6 +25,7 @@ public:
 	RECT* GetRect() { return &m_rect; }
 	Position GetPos() { return m_pos; }
 	PIECE_COLOR GetColor() { return m_color; }
+	IMAGE GetImage() { return m_imageIndex; }
 	int GetPosX() { return m_ix; }
 	int GetPosY() { return m_iy; }
 	//vector<RECT> GetRoute() { return m_route; }

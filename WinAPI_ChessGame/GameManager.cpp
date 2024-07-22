@@ -10,11 +10,21 @@ void GameManager::Init(HWND hWnd)
 	//배열에 이미지 경로 넣는 작업
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_tile1 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE1);
-	//m_tile1 = BitMapManager::GetInstance()->GetImage(IMAGE_MOVETILE);
     m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE2);
-	//m_tile2 = BitMapManager::GetInstance()->GetTestTile();
-	//m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_MOVETILE);
-	//m_rBitMap = BitMapManager::GetInstance()->GetTestTile();
+	m_state = Main;
+	//(800 - 200) / 2 = 300
+	startRect.left = (615 - 200) / 2;
+	//(800 - 50) / 2 - 50 = 325
+	startRect.top = (700 - 50) / 2 - 50;
+	//300 + 200 = 500
+	startRect.right = startRect.left + 200;
+	//325 + 50 = 375
+	startRect.bottom = startRect.top + 50;
+
+	endRect.left = startRect.left;
+	endRect.top = startRect.bottom + 50;
+	endRect.right = startRect.right;
+	endRect.bottom = endRect.top + 50;
 	InitBoard();
 	InitPiece();
 }
@@ -137,6 +147,23 @@ bool GameManager::CheckCollide(POINT point)
 
 void GameManager::Draw(HDC hdc)
 {
+	switch (m_state)
+	{
+	case Main:
+	{
+		break;
+	}
+	case GamePlay:
+	{
+		break;
+	}
+	case GameEnd:
+	{
+		break;
+	}
+	default:
+		break;
+	}
 	int x = XSTART;
 	int y = YSTART;
 	for (int i = 0; i < 8; i++)
@@ -166,10 +193,17 @@ void GameManager::Draw(HDC hdc)
 
 	char w_buf[256];
 	char b_buf[256];
-	sprintf_s(w_buf, "w_size : %d", m_pieces[0].size());
-	sprintf_s(b_buf, "b_size : %d", m_pieces[1].size());
+	sprintf_s(w_buf, "white : %d", m_pieces[0].size());
+	sprintf_s(b_buf, "black : %d", m_pieces[1].size());
 	TextOutA(hdc, 10, 620, w_buf, strlen(w_buf));
 	TextOutA(hdc, 10, 640, b_buf, strlen(b_buf));
+
+	//게임이 끝날시 승자의 Text출력
+	if (isOver)
+	{
+		TextOut(hdc, 250, 620, winstr.c_str(), winstr.length());
+	}
+
 	if (m_select != nullptr)
 	{
 		m_select->RouteDraw(hdc);
@@ -212,17 +246,6 @@ bool GameManager::CheckRoute(POINT point)
 
 void GameManager::MovePiece(POINT point)
 {
-	////이전좌표 x,y는 현재로 저장 후 좌표 변경
-	//int oldX = m_select->GetPosX();
-	//int oldY = m_select->GetPosY();
-	//int newX = point.x / 75;
-	//int newY = point.y / 75;
-
-	//m_select->Init(newX, newY);
-	//m_colors[oldY][oldX] = PIECE_COLOR_NONE;
-	//m_colors[newY][newX] = m_select->GetColor();
-	//m_select = nullptr;
-	
 	//이전좌표 x,y는 현재로 저장 후 좌표 변경
 	int oldX = m_select->GetPosX();
 	int oldY = m_select->GetPosY();
@@ -239,6 +262,12 @@ void GameManager::MovePiece(POINT point)
 			{
 				if ((*iter)->GetPosX() == newX && (*iter)->GetPosY() == newY)
 				{
+					//킹일시 게임종료
+					if ((*iter)->GetImage() == IMAGE_BLACK_KING || (*iter)->GetImage() == IMAGE_WHITE_KING)
+					{
+						((*iter)->GetImage() == IMAGE_BLACK_KING) ? winstr = L"White Win!" : winstr = L"Black Win!";
+						isOver = true;
+					}
 					delete *iter;
 				    m_pieces[i].erase(iter);
 					break;
@@ -256,6 +285,14 @@ void GameManager::MovePiece(POINT point)
 	m_colors[oldY][oldX] = PIECE_COLOR_NONE;
 	//새로운좌표공간은 그 객체의 색으로
 	m_colors[newY][newX] = m_select->GetColor();
+	//프로모션 검사
+	if (m_select->GetImage() == IMAGE_WHITE_PAWN && newY == 0 || m_select->GetImage() == IMAGE_BLACK_PAWN && newY == 7)
+	{
+		//프로모션 수행!
+		MessageBoxA(m_hWnd, "Promotion!", "Promotion!", MB_OK);
+		//프로모션에 newY와newX의 좌표를 넘겨줘야함
+		Promotion(newX, newY);
+	}
 	m_select = nullptr;
 }
 
@@ -274,6 +311,41 @@ void GameManager::TurnChange()
 {
 	//화이트 턴이면 블랙으로 아니면 화이트로
 	m_turn = (m_turn == PIECE_COLOR_WHITE) ? PIECE_COLOR_BLACK : PIECE_COLOR_WHITE;
+}
+
+void GameManager::Promotion(int x, int y)
+{
+	//폰이 끝에 도달했을 때 호출되는 함수
+	//우선 벡터에 들어있는 폰의 데이터를 삭제..
+	//테스트로 퀸으로 해보자. 퀸의 객체 생성해서 벡터에 삽입 후 이전 폰의 영역에 할당.
+	PIECE_COLOR color = m_colors[y][x];
+
+	//폰 삭제
+	for (int i = 0; i < 2; i++)
+	{
+		for (auto iter = m_pieces[i].begin(); iter != m_pieces[i].end(); iter++)
+		{
+			if ((*iter)->GetPosX() == x && (*iter)->GetPosY() == y)
+			{
+				delete* iter;
+				m_pieces[i].erase(iter);
+				break;
+			}
+		}
+	}
+
+	Piece* newPiece;
+	if (color == PIECE_COLOR_WHITE)
+	{
+		newPiece = new Queen(x, y, IMAGE_WHITE_QUEEN, PIECE_COLOR_WHITE);
+	}
+	else
+	{
+		newPiece = new Queen(x, y, IMAGE_BLACK_QUEEN, PIECE_COLOR_BLACK);
+	}
+
+	m_pieces[color == PIECE_COLOR_WHITE ? 0 : 1].push_back(newPiece);
+	m_colors[y][x] = color;
 }
 
 PIECE_COLOR GameManager::GetPieceColor(RECT rect)
