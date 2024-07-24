@@ -9,7 +9,6 @@ Pawn::Pawn(int x, int y, IMAGE index, PIECE_COLOR color) : Piece(x, y, index, co
 
 void Pawn::Init(int x, int y)
 {
-	//m_route.clear();
 	Piece::Init(x, y);
 }
 
@@ -68,11 +67,6 @@ vector<RECT> Pawn::RouteNav()
 			m_route.push_back(r_diagonal);
 	}
 
-	if (firstMove)
-	{
-		firstMove = false;
-	}
-
 	return m_route;
 }
 
@@ -86,7 +80,7 @@ void Pawn::RouteDraw(HDC hdc)
 {
 	for (RECT r : RouteNav())
 	{
-		m_rBitMap->TestDraw(hdc, r.left, r.top);
+		m_rBitMap->AlphaDraw(hdc, r.left, r.top);
 	}
 }
 

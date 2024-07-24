@@ -4,13 +4,17 @@ GameManager* GameManager::instance = nullptr;
 
 void GameManager::Init(HWND hWnd)
 {
+	
 	m_hWnd = hWnd;
 	int x = 0;
 	int y = 0;
+	timer = 5;
+	isEnd = false;
 	//배열에 이미지 경로 넣는 작업
 	BitMapManager::GetInstance()->Init(m_hWnd);
 	m_tile1 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE1);
     m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE2);
+	m_turn = PIECE_COLOR_WHITE;
 	m_state = Main;
 	//(800 - 200) / 2 = 300
 	startRect.left = (615 - 200) / 2;
@@ -58,6 +62,7 @@ void GameManager::InitBoard()
 
 void GameManager::InitPiece()
 {
+
 	//백색 폰
 	for (int i = 0; i < 8; i++)
 	{
@@ -116,30 +121,87 @@ void GameManager::InitPiece()
 	m_colors[0][3] = PIECE_COLOR_BLACK;
 	m_colors[0][4] = PIECE_COLOR_BLACK;
 	
+	m_promotionimage[0].push_back(BitMapManager::GetInstance()->GetImage(IMAGE_BLACK_ROOK));
+	m_promotionimage[0].push_back(BitMapManager::GetInstance()->GetImage(IMAGE_BLACK_KNIGHT));
+	m_promotionimage[0].push_back(BitMapManager::GetInstance()->GetImage(IMAGE_BLACK_BISHOP));
+	m_promotionimage[0].push_back(BitMapManager::GetInstance()->GetImage(IMAGE_BLACK_QUEEN));
+
+	m_promotionimage[1].push_back(BitMapManager::GetInstance()->GetImage(IMAGE_WHITE_ROOK));
+	m_promotionimage[1].push_back(BitMapManager::GetInstance()->GetImage(IMAGE_WHITE_KNIGHT));
+	m_promotionimage[1].push_back(BitMapManager::GetInstance()->GetImage(IMAGE_WHITE_BISHOP));
+	m_promotionimage[1].push_back(BitMapManager::GetInstance()->GetImage(IMAGE_WHITE_QUEEN));
 }
 
 bool GameManager::CheckCollide(POINT point)
 {
-	for (int i = 0; i < 2; i++)
+	switch (m_state)
 	{
-		for (int j = 0; j < m_pieces[i].size(); j++)
+	case Main:
+	{
+		//게임시작
+		if (PtInRect(&startRect, point))
 		{
-			//영역이 null이 아니며 클릭에 성공했을 경우
-		
-			if (m_pieces[i][j] != nullptr && PtInRect(m_pieces[i][j]->GetRect(), point))
+			m_state = GamePlay;
+			return true;
+		}
+		//윈도우 종료
+		if (PtInRect(&endRect, point))
+		{
+			PostQuitMessage(0);
+		}
+		break;
+	}
+	case GamePlay:
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			for (int j = 0; j < m_pieces[i].size(); j++)
 			{
-				if (m_pieces[i][j]->GetColor() == m_turn)
+				//영역이 null이 아니며 클릭에 성공했을 경우
+				if (m_pieces[i][j] != nullptr && PtInRect(m_pieces[i][j]->GetRect(), point))
 				{
-					//해당 클래스의 경로탐색 작업 실행.
-					m_select = m_pieces[i][j];
-					m_select->RouteNav();
+					if (m_pieces[i][j]->GetColor() == m_turn)
+					{
+						//해당 클래스의 경로탐색 작업 실행.
+						m_select = m_pieces[i][j];
+						return true;
+					}
 
-					return true;
 				}
-				
 			}
 		}
+		break;
 	}
+	case PawnPromotion:
+	{
+		int size = m_promotionimage[0].size();
+		int color = 0;
+		//이미 턴은 상대턴으로 변경이 되었기 떄문에 화이트가 블랙이고 블랙이고 화이트로 사용되어야 한다.
+		switch (m_turn)
+		{
+		case PIECE_COLOR_BLACK:
+			color = 1;
+			break;
+		case PIECE_COLOR_WHITE:
+			color = 0;
+			break;
+		}
+		for (int i = 0; i < size; i++)
+		{
+			if (PtInRect(m_promotionimage[color][i]->GetRect(promotionPos[i][0] * 75, promotionPos[i][1] * 75), point))
+			{
+				//m_promotionimage의 이미지타입만 전달해주면 끝인데..~~
+				Promotion(newX, newY, m_promotionimage[color][i]->GetImage());
+				m_state = GamePlay;
+				return true;
+			}
+		}
+		break;
+	}
+	default:
+		break;
+	}
+	
 
 	return false;
 }
@@ -151,64 +213,81 @@ void GameManager::Draw(HDC hdc)
 	{
 	case Main:
 	{
+		Rectangle(hdc, startRect.left, startRect.top, startRect.right, startRect.bottom);
+		TextOut(hdc, 270, 290, TEXT("StartGame"), 9);
+		Rectangle(hdc, endRect.left, endRect.top, endRect.right, endRect.bottom);
+		TextOut(hdc, 270, 390, TEXT("EndGame"), 7);
 		break;
 	}
 	case GamePlay:
 	{
+		int x = XSTART;
+		int y = YSTART;
+		for (int i = 0; i < 8; i++)
+		{
+			for (int j = 0; j < 8; j++)
+			{
+				//타일이 연속되지 않게 그리기 위함.
+				if ((i + j) % 2 == 0)
+				{
+					m_tile1->Draw(hdc, x, y);
+				}
+				else
+				{
+					m_tile2->Draw(hdc, x, y);
+				}
+				x += TILE_SIZE;
+			}
+			x = XSTART;
+			y += TILE_SIZE;
+		}
+
+		PieceDraw(hdc);
+		if (m_turn == PIECE_COLOR_WHITE)
+			TextOutA(hdc, 270, 620, "WhiteTurn", 9);
+		else
+			TextOutA(hdc, 270, 620, "BlackTurn", 9);
+
+		if (m_select != nullptr)
+		{
+			m_select->RouteDraw(hdc);
+		}
+		break;
+	}
+	case PawnPromotion:
+	{
+		int size = m_promotionimage[0].size();
+		int color = 0;
+		//이미 턴은 상대턴으로 변경이 되었기 떄문에 화이트가 블랙이고 블랙이 화이트로 사용되어야 한다.
+		switch (m_turn)
+		{
+		case PIECE_COLOR_BLACK:
+			color = 1;
+			break;
+		case PIECE_COLOR_WHITE:
+			color = 0;
+			break;
+		}
+		for (int i = 0; i < size; i++)
+		{
+			m_promotionimage[color][i]->Draw(hdc, promotionPos[i][0] * 75, promotionPos[i][1] * 75);
+		}
+		
+		TextOut(hdc, 250, 400, TEXT("말을 선택하세요."), 9);
 		break;
 	}
 	case GameEnd:
 	{
+		char c_buf[256];
+		sprintf_s(c_buf, "%d초 뒤에 메인 메뉴로 이동합니다.", timer);
+		TextOutA(hdc, 200, 250, c_buf, strlen(c_buf));
+		TextOut(hdc, 270, 350, winstr.c_str(), winstr.length());
 		break;
 	}
 	default:
 		break;
 	}
-	int x = XSTART;
-	int y = YSTART;
-	for (int i = 0; i < 8; i++)
-	{
-		for (int j = 0; j < 8; j++)
-		{
-			//타일이 연속되지 않게 그리기 위함.
-			if ((i + j) % 2 == 0)
-			{
-				m_tile1->Draw(hdc, x, y);
-			}
-			else
-			{
-				m_tile2->Draw(hdc, x, y);
-			}
-			x += TILE_SIZE;
-		}
-		x = XSTART;
-		y += TILE_SIZE;
-	}
-
-	PieceDraw(hdc);
-	if (m_turn == PIECE_COLOR_WHITE)
-		TextOutA(hdc, 250, 620, "WhiteTurn", 9);
-	else
-		TextOutA(hdc, 250, 620, "BlackTurn", 9);
-
-	char w_buf[256];
-	char b_buf[256];
-	sprintf_s(w_buf, "white : %d", m_pieces[0].size());
-	sprintf_s(b_buf, "black : %d", m_pieces[1].size());
-	TextOutA(hdc, 10, 620, w_buf, strlen(w_buf));
-	TextOutA(hdc, 10, 640, b_buf, strlen(b_buf));
-
-	//게임이 끝날시 승자의 Text출력
-	if (isOver)
-	{
-		TextOut(hdc, 250, 620, winstr.c_str(), winstr.length());
-	}
-
-	if (m_select != nullptr)
-	{
-		m_select->RouteDraw(hdc);
-		//InvalidateRect(m_hWnd, NULL, TRUE);
-	}
+	
 }
 
 void GameManager::PieceDraw(HDC hdc)
@@ -249,8 +328,9 @@ void GameManager::MovePiece(POINT point)
 	//이전좌표 x,y는 현재로 저장 후 좌표 변경
 	int oldX = m_select->GetPosX();
 	int oldY = m_select->GetPosY();
-	int newX = point.x / 75;
-	int newY = point.y / 75;
+
+	newX = point.x / 75;
+	newY = point.y / 75;
 
 	//다음 좌표에 저장된 색이 NONE이 아니면서 
 	//현재 자기와 같은 색깔이 아닐 경우
@@ -266,15 +346,16 @@ void GameManager::MovePiece(POINT point)
 					if ((*iter)->GetImage() == IMAGE_BLACK_KING || (*iter)->GetImage() == IMAGE_WHITE_KING)
 					{
 						((*iter)->GetImage() == IMAGE_BLACK_KING) ? winstr = L"White Win!" : winstr = L"Black Win!";
-						isOver = true;
+						m_state = GameEnd;
+						SetTimer(m_hWnd, 1, 1000, NULL);
+						SetTimer(m_hWnd, 2, 5000, NULL);
+						isEnd = true;
 					}
 					delete *iter;
 				    m_pieces[i].erase(iter);
 					break;
 				}
-
 			}
-			
 		}
 		m_colors[newY][newX] = PIECE_COLOR_NONE;
 	}
@@ -286,25 +367,20 @@ void GameManager::MovePiece(POINT point)
 	//새로운좌표공간은 그 객체의 색으로
 	m_colors[newY][newX] = m_select->GetColor();
 	//프로모션 검사
-	if (m_select->GetImage() == IMAGE_WHITE_PAWN && newY == 0 || m_select->GetImage() == IMAGE_BLACK_PAWN && newY == 7)
+	if (!isEnd)
 	{
-		//프로모션 수행!
-		MessageBoxA(m_hWnd, "Promotion!", "Promotion!", MB_OK);
-		//프로모션에 newY와newX의 좌표를 넘겨줘야함
-		Promotion(newX, newY);
+		if (m_select->GetImage() == IMAGE_WHITE_PAWN && newY == 0 || m_select->GetImage() == IMAGE_BLACK_PAWN && newY == 7)
+		{
+			m_state = PawnPromotion;
+		}
+	}
+	
+
+	if ((m_select->GetImage() == IMAGE_WHITE_PAWN || m_select->GetImage() == IMAGE_BLACK_PAWN ) && m_select->GetFirstMove())
+	{
+		m_select->SetFirstMove();
 	}
 	m_select = nullptr;
-}
-
-void GameManager::RemovePiece(int x, int y)
-{
-
-}
-
-bool GameManager::KillPiece(POINT point)
-{
-	
-	return false;
 }
 
 void GameManager::TurnChange()
@@ -313,7 +389,22 @@ void GameManager::TurnChange()
 	m_turn = (m_turn == PIECE_COLOR_WHITE) ? PIECE_COLOR_BLACK : PIECE_COLOR_WHITE;
 }
 
-void GameManager::Promotion(int x, int y)
+void GameManager::UpdateTimer()
+{
+	if (m_state == GameEnd)
+	{
+		timer--;
+		if (timer <= 0)
+		{
+			m_state = Main;
+			KillTimer(m_hWnd, 1);
+			KillTimer(m_hWnd, 2);
+		}
+		InvalidateRect(m_hWnd, NULL, TRUE);
+	}
+}
+
+void GameManager::Promotion(int x, int y, IMAGE type)
 {
 	//폰이 끝에 도달했을 때 호출되는 함수
 	//우선 벡터에 들어있는 폰의 데이터를 삭제..
@@ -335,17 +426,42 @@ void GameManager::Promotion(int x, int y)
 	}
 
 	Piece* newPiece;
-	if (color == PIECE_COLOR_WHITE)
+	//색상에 맞게
+	switch (type)
 	{
-		newPiece = new Queen(x, y, IMAGE_WHITE_QUEEN, PIECE_COLOR_WHITE);
-	}
-	else
-	{
-		newPiece = new Queen(x, y, IMAGE_BLACK_QUEEN, PIECE_COLOR_BLACK);
+	case IMAGE_BLACK_KNIGHT:
+	case IMAGE_WHITE_KNIGHT:
+		newPiece = new Knight(x, y, type, color);
+		break;
+	case IMAGE_BLACK_BISHOP:
+	case IMAGE_WHITE_BISHOP:
+		newPiece = new Bishop(x, y, type, color);
+		break;
+	case IMAGE_BLACK_ROOK:
+	case IMAGE_WHITE_ROOK:
+		newPiece = new Rook(x, y, type, color);
+		break;
+	case IMAGE_BLACK_QUEEN:
+	case IMAGE_WHITE_QUEEN:
+		newPiece = new Queen(x, y, type, color);
+		break;
 	}
 
 	m_pieces[color == PIECE_COLOR_WHITE ? 0 : 1].push_back(newPiece);
 	m_colors[y][x] = color;
+}
+
+void GameManager::Reset()
+{
+	for (int i = 0; i < 2; ++i)
+	{
+		m_pieces[i].clear();
+		m_pieces[i].resize(16);
+
+		m_promotionimage[i].clear();
+	}	
+	
+	Init(m_hWnd);
 }
 
 PIECE_COLOR GameManager::GetPieceColor(RECT rect)

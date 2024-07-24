@@ -46,11 +46,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // 기본 메시지 루프입니다:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-
     }
+
+ 
 
     return (int)msg.wParam;
 }
@@ -107,6 +107,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
+    KillTimer(hWnd, 1);
 
     return TRUE;
 }
@@ -134,7 +135,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_LBUTTONDOWN:
         Point.x = LOWORD(lParam);
         Point.y = HIWORD(lParam);
-        if (GameManager::Instance()->CheckCollide(Point) || GameManager::Instance()->CheckRoute(Point) || GameManager::Instance()->KillPiece(Point))
+        if (GameManager::Instance()->CheckCollide(Point) || GameManager::Instance()->CheckRoute(Point))
         {
             InvalidateRect(hWnd, NULL, TRUE); // 화면 갱신
         }
@@ -144,7 +145,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
         EndPaint(hWnd, &ps);
         return 0;
+    case WM_TIMER:
+    {
+        if (wParam == 1)
+        {
+            GameManager::Instance()->UpdateTimer();
+        }
+        else if (wParam == 2)
+        {
+            GameManager::Instance()->Reset();
+            KillTimer(hWnd, 2);
+            InvalidateRect(hWnd, NULL, TRUE);
+        }
+        return 0;
+    }
     case WM_DESTROY:
+        KillTimer(hWnd, 1);
+        KillTimer(hWnd, 2);
         GameManager::Release(); //싱글톤 해제
         PostQuitMessage(0);
         return 0;

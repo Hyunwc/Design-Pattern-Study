@@ -15,11 +15,11 @@ void BitMapManager::Init(HWND hWnd)
 	for (int i = IMAGE_START; i < IMAGE_END; i++)
 	{
 		sprintf_s(buf, "RES//block0%d.bmp", i);
-		m_parrBitMap[i].Init(hdc, buf);
+		m_parrBitMap[i].Init(hdc, buf, static_cast<IMAGE>(i));
 	}
 
 	sprintf_s(buf, "RES//MoveableTileMask.bmp");
-	m_tile->Init(hdc, buf);
+	m_tile->Init(hdc, buf, IMAGE_MOVETILE);
 
 	ReleaseDC(hWnd, hdc);
 }

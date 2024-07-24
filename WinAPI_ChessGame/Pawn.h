@@ -13,5 +13,7 @@ public:
 	void RouteDraw(HDC hdc) override;
 	bool IsMoveable(RECT rect) override;
 	bool IsEnemy(RECT rect);
+	bool GetFirstMove() { return firstMove; }
+	void SetFirstMove() { firstMove = false; }
 	//~Pawn(){ GameManager::Release(); }
 };

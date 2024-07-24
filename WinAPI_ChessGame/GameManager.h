@@ -20,32 +20,36 @@ enum GameState
 {
 	Main,
 	GamePlay,
+	PawnPromotion,
 	GameEnd
 };
 class GameManager
 {
 private:
 	static GameManager* instance;
-	//테스트용
 	BitMap* m_tile1;
 	BitMap* m_tile2;
-	BitMap* m_rBitMap;
 	HWND m_hWnd;
 	HDC m_hdc;
 	RECT m_board[8][8]; //타일의 영역
 	PIECE_COLOR m_colors[8][8]; 
 	GameState m_state;
 	RECT startRect, endRect;
-	bool isMove;
-	bool isWhiteTurn;
-	int winner;
 	wstring winstr;
-	bool isOver;
+	bool isEnd; 
 	PIECE_COLOR m_turn;
+	vector<BitMap*> m_promotionimage[2];
+	int timer;
+	int promotionPos[4][2] =
+	{
+		{2,1},{5,1}, {2,3}, {5,3}
+	};
+	RECT promotions[4];
+	int newX, newY;
 	//흑과 백을 담을 2개의 벡터를 길이가2인 m_pieces라는 벡터에게 할당
 	vector<Piece*> m_pieces[2] = { vector<Piece*>(16, nullptr), vector<Piece*>(16, nullptr) };
 	Piece* m_select = nullptr;
-	GameManager() : isMove(false), isWhiteTurn(true), isOver(false), m_turn(PIECE_COLOR_WHITE) {}
+	GameManager() : m_turn(PIECE_COLOR_WHITE) {}
 public:
 	~GameManager();
 	static GameManager* Instance()
@@ -73,11 +77,11 @@ public:
 	
 	bool CheckRoute(POINT point);
 	void MovePiece(POINT point);
-	void RemovePiece(int x, int y);
-	bool KillPiece(POINT point);
 	void TurnChange();
-	void Promotion(int x, int y);
+	void UpdateTimer();
+	void Promotion(int x, int y, IMAGE type = IMAGE_BLACK_QUEEN);
+	void SetState(GameState state) { m_state = state; }
+	void Reset();
 
 	PIECE_COLOR GetPieceColor(RECT rect);
-	
 };

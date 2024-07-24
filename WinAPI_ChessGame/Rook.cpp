@@ -57,7 +57,7 @@ void Rook::RouteDraw(HDC hdc)
 {
 	for (RECT r : RouteNav())
 	{
-		m_rBitMap->TestDraw(hdc, r.left, r.top);
+		m_rBitMap->AlphaDraw(hdc, r.left, r.top);
 	}
 }
 
