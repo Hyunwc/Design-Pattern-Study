@@ -76,6 +76,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CHESSGAME));
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    //wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wcex.lpszMenuName = NULL;//MAKEINTRESOURCEW(IDC_CHESSGAME);
     wcex.lpszClassName = IpszClass;
     wcex.hIconSm = NULL;//LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -137,7 +138,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         Point.y = HIWORD(lParam);
         if (GameManager::Instance()->CheckCollide(Point) || GameManager::Instance()->CheckRoute(Point))
         {
-            InvalidateRect(hWnd, NULL, TRUE); // 화면 갱신
+            InvalidateRect(hWnd, NULL, false); // 화면 갱신
         }
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
@@ -155,7 +156,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             GameManager::Instance()->Reset();
             KillTimer(hWnd, 2);
-            InvalidateRect(hWnd, NULL, TRUE);
+            InvalidateRect(hWnd, NULL, false);
         }
         return 0;
     }

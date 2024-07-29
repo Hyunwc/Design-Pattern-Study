@@ -47,6 +47,6 @@ public:
 		return m_tile;
 	}
 
-	void Init(HWND hWnd);
+	void Init(HDC hdc);
 	~BitMapManager();
 };

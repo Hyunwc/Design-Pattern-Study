@@ -8,10 +8,10 @@ BitMapManager::BitMapManager()
 	m_tile = new BitMap;
 }
 
-void BitMapManager::Init(HWND hWnd)
+void BitMapManager::Init(HDC hdc)
 {
 	char buf[256];
-	HDC hdc = GetDC(hWnd);
+	//HDC hdc = GetDC(hWnd);
 	for (int i = IMAGE_START; i < IMAGE_END; i++)
 	{
 		sprintf_s(buf, "RES//block0%d.bmp", i);
@@ -21,7 +21,7 @@ void BitMapManager::Init(HWND hWnd)
 	sprintf_s(buf, "RES//MoveableTileMask.bmp");
 	m_tile->Init(hdc, buf, IMAGE_MOVETILE);
 
-	ReleaseDC(hWnd, hdc);
+	//ReleaseDC(hWnd, hdc);
 }
 
 BitMapManager::~BitMapManager()

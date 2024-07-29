@@ -6,12 +6,14 @@ void GameManager::Init(HWND hWnd)
 {
 	
 	m_hWnd = hWnd;
+	HDC hdc = GetDC(m_hWnd);
 	int x = 0;
 	int y = 0;
 	timer = 5;
 	isEnd = false;
+
 	//배열에 이미지 경로 넣는 작업
-	BitMapManager::GetInstance()->Init(m_hWnd);
+	BitMapManager::GetInstance()->Init(hdc);
 	m_tile1 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE1);
     m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE2);
 	m_turn = PIECE_COLOR_WHITE;
@@ -29,6 +31,17 @@ void GameManager::Init(HWND hWnd)
 	endRect.top = startRect.bottom + 50;
 	endRect.right = startRect.right;
 	endRect.bottom = endRect.top + 50;
+
+	RECT clientRect;
+	GetClientRect(m_hWnd, &clientRect);
+	//영역이 아닌 윈도의 가로,세로
+	widht = clientRect.right + 1;
+	height = clientRect.bottom + 1;
+
+	backDC = CreateCompatibleDC(hdc);
+
+	ReleaseDC(m_hWnd, hdc);
+
 	InitBoard();
 	InitPiece();
 }
@@ -209,14 +222,20 @@ bool GameManager::CheckCollide(POINT point)
 
 void GameManager::Draw(HDC hdc)
 {
+	//여기만 수정하면됨
+	//backBitMap은 
+	HBITMAP backBitmap = CreateCompatibleBitmap(hdc, widht, height);	
+	SelectObject(backDC, backBitmap);
+
 	switch (m_state)
 	{
 	case Main:
 	{
-		Rectangle(hdc, startRect.left, startRect.top, startRect.right, startRect.bottom);
-		TextOut(hdc, 270, 290, TEXT("StartGame"), 9);
-		Rectangle(hdc, endRect.left, endRect.top, endRect.right, endRect.bottom);
-		TextOut(hdc, 270, 390, TEXT("EndGame"), 7);
+		Rectangle(backDC, startRect.left, startRect.top, startRect.right, startRect.bottom);
+		Rectangle(backDC, endRect.left, endRect.top, endRect.right, endRect.bottom);
+		TextOut(backDC, 270, 290, TEXT("StartGame"), 9);
+		TextOut(backDC, 270, 390, TEXT("EndGame"), 7);
+
 		break;
 	}
 	case GamePlay:
@@ -230,11 +249,11 @@ void GameManager::Draw(HDC hdc)
 				//타일이 연속되지 않게 그리기 위함.
 				if ((i + j) % 2 == 0)
 				{
-					m_tile1->Draw(hdc, x, y);
+					m_tile1->Draw(backDC, x, y);
 				}
 				else
 				{
-					m_tile2->Draw(hdc, x, y);
+					m_tile2->Draw(backDC, x, y);
 				}
 				x += TILE_SIZE;
 			}
@@ -242,16 +261,17 @@ void GameManager::Draw(HDC hdc)
 			y += TILE_SIZE;
 		}
 
-		PieceDraw(hdc);
+		PieceDraw(backDC);
 		if (m_turn == PIECE_COLOR_WHITE)
-			TextOutA(hdc, 270, 620, "WhiteTurn", 9);
+			TextOutA(backDC, 270, 620, "WhiteTurn", 9);
 		else
-			TextOutA(hdc, 270, 620, "BlackTurn", 9);
+			TextOutA(backDC, 270, 620, "BlackTurn", 9);
 
 		if (m_select != nullptr)
 		{
-			m_select->RouteDraw(hdc);
+			m_select->RouteDraw(backDC);
 		}
+		//BitBlt(hdc, 0, 0, clientRect.right + 1, clientRect.bottom + 1, backDC, 0, 0, SRCCOPY);
 		break;
 	}
 	case PawnPromotion:
@@ -270,24 +290,27 @@ void GameManager::Draw(HDC hdc)
 		}
 		for (int i = 0; i < size; i++)
 		{
-			m_promotionimage[color][i]->Draw(hdc, promotionPos[i][0] * 75, promotionPos[i][1] * 75);
+			m_promotionimage[color][i]->Draw(backDC, promotionPos[i][0] * 75, promotionPos[i][1] * 75);
 		}
-		
-		TextOut(hdc, 250, 400, TEXT("말을 선택하세요."), 9);
+
+		TextOut(backDC, 250, 400, TEXT("말을 선택하세요."), 9);
 		break;
 	}
 	case GameEnd:
 	{
 		char c_buf[256];
 		sprintf_s(c_buf, "%d초 뒤에 메인 메뉴로 이동합니다.", timer);
-		TextOutA(hdc, 200, 250, c_buf, strlen(c_buf));
-		TextOut(hdc, 270, 350, winstr.c_str(), winstr.length());
+		TextOutA(backDC, 200, 250, c_buf, strlen(c_buf));
+		TextOut(backDC, 270, 350, winstr.c_str(), winstr.length());
 		break;
 	}
 	default:
 		break;
 	}
+
+	BitBlt(hdc, 0, 0, widht, height, backDC, 0, 0, SRCCOPY);
 	
+	DeleteObject(backBitmap);
 }
 
 void GameManager::PieceDraw(HDC hdc)
@@ -400,7 +423,7 @@ void GameManager::UpdateTimer()
 			KillTimer(m_hWnd, 1);
 			KillTimer(m_hWnd, 2);
 		}
-		InvalidateRect(m_hWnd, NULL, TRUE);
+		InvalidateRect(m_hWnd, NULL, false);
 	}
 }
 
@@ -484,7 +507,8 @@ PIECE_COLOR GameManager::GetPieceColor(RECT rect)
 
 GameManager::~GameManager()
 {
-	DeleteDC(m_hdc);
+	
+	DeleteDC(backDC);
 	for (int i = 0; i < 2; ++i)
 	{
 		for (int j = 0; j < m_pieces[i].size(); ++j)
