@@ -35,10 +35,12 @@ void GameManager::Init(HWND hWnd)
 	RECT clientRect;
 	GetClientRect(m_hWnd, &clientRect);
 	//영역이 아닌 윈도의 가로,세로
-	widht = clientRect.right + 1;
+	width = clientRect.right + 1;
 	height = clientRect.bottom + 1;
 
 	backDC = CreateCompatibleDC(hdc);
+	backRect = { 0, 0, width, height };
+	whiteBrush = CreateSolidBrush(RGB(255, 255, 255));
 
 	ReleaseDC(m_hWnd, hdc);
 
@@ -223,9 +225,13 @@ bool GameManager::CheckCollide(POINT point)
 void GameManager::Draw(HDC hdc)
 {
 	//여기만 수정하면됨
-	//backBitMap은 
-	HBITMAP backBitmap = CreateCompatibleBitmap(hdc, widht, height);	
+	//backBitMap은 매번 생성 삭제가 되어야함.
+	
+	HBITMAP backBitmap = CreateCompatibleBitmap(hdc, width, height);
 	SelectObject(backDC, backBitmap);
+	 
+	FillRect(backDC, &backRect, whiteBrush);
+	
 
 	switch (m_state)
 	{
@@ -308,7 +314,7 @@ void GameManager::Draw(HDC hdc)
 		break;
 	}
 
-	BitBlt(hdc, 0, 0, widht, height, backDC, 0, 0, SRCCOPY);
+	BitBlt(hdc, 0, 0, width, height, backDC, 0, 0, SRCCOPY);
 	
 	DeleteObject(backBitmap);
 }
@@ -509,6 +515,7 @@ GameManager::~GameManager()
 {
 	
 	DeleteDC(backDC);
+	DeleteObject(whiteBrush);
 	for (int i = 0; i < 2; ++i)
 	{
 		for (int j = 0; j < m_pieces[i].size(); ++j)

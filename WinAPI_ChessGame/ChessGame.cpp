@@ -160,6 +160,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         return 0;
     }
+    case WM_ERASEBKGND:
+        return 1;
     case WM_DESTROY:
         KillTimer(hWnd, 1);
         KillTimer(hWnd, 2);

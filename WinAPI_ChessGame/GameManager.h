@@ -40,8 +40,10 @@ private:
 	PIECE_COLOR m_turn;
 	vector<BitMap*> m_promotionimage[2];
 	int timer;
-	int widht, height;
+	int width, height;
 	HDC backDC;
+	RECT backRect;
+	HBRUSH whiteBrush;
 	int promotionPos[4][2] =
 	{
 		{2,1},{5,1}, {2,3}, {5,3}
@@ -52,9 +54,7 @@ private:
 	//흑과 백을 담을 2개의 벡터를 길이가2인 m_pieces라는 벡터에게 할당
 	vector<Piece*> m_pieces[2] = { vector<Piece*>(16, nullptr), vector<Piece*>(16, nullptr) };
 	Piece* m_select = nullptr;
-	/*RECT clientRect;
-	HBITMAP backBitmap;
-	HDC backDC;*/
+	
 	GameManager() : m_turn(PIECE_COLOR_WHITE) {
 		
 	}
