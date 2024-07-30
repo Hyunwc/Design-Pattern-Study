@@ -6,14 +6,30 @@ void GameManager::Init(HWND hWnd)
 {
 	
 	m_hWnd = hWnd;
-	HDC hdc = GetDC(m_hWnd);
 	int x = 0;
 	int y = 0;
 	timer = 5;
 	isEnd = false;
 
+
+
+	RECT clientRect;
+	GetClientRect(m_hWnd, &clientRect);
+	//영역이 아닌 윈도의 가로,세로
+	width = clientRect.right + 1;
+	height = clientRect.bottom + 1;
+	//이렇게 해도되고 SetRect() 이용해도됨.
+	backRect = { 0, 0, width, height };
+
+	HDC hdc = GetDC(m_hWnd);
+	backDC = CreateCompatibleDC(hdc);
+
 	//배열에 이미지 경로 넣는 작업
 	BitMapManager::GetInstance()->Init(hdc);
+
+	ReleaseDC(m_hWnd, hdc);
+
+
 	m_tile1 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE1);
     m_tile2 = BitMapManager::GetInstance()->GetImage(IMAGE_TILE2);
 	m_turn = PIECE_COLOR_WHITE;
@@ -31,18 +47,6 @@ void GameManager::Init(HWND hWnd)
 	endRect.top = startRect.bottom + 50;
 	endRect.right = startRect.right;
 	endRect.bottom = endRect.top + 50;
-
-	RECT clientRect;
-	GetClientRect(m_hWnd, &clientRect);
-	//영역이 아닌 윈도의 가로,세로
-	width = clientRect.right + 1;
-	height = clientRect.bottom + 1;
-
-	backDC = CreateCompatibleDC(hdc);
-	backRect = { 0, 0, width, height };
-	whiteBrush = CreateSolidBrush(RGB(255, 255, 255));
-
-	ReleaseDC(m_hWnd, hdc);
 
 	InitBoard();
 	InitPiece();
@@ -181,7 +185,6 @@ bool GameManager::CheckCollide(POINT point)
 						m_select = m_pieces[i][j];
 						return true;
 					}
-
 				}
 			}
 		}
@@ -230,9 +233,9 @@ void GameManager::Draw(HDC hdc)
 	HBITMAP backBitmap = CreateCompatibleBitmap(hdc, width, height);
 	SelectObject(backDC, backBitmap);
 	 
-	FillRect(backDC, &backRect, whiteBrush);
+	//(dc, 사각형구조체, brush handle(CreateSolidBursh)이용)
+	FillRect(backDC, &backRect, CreateSolidBrush(RGB(255, 255, 255)));
 	
-
 	switch (m_state)
 	{
 	case Main:
@@ -277,7 +280,6 @@ void GameManager::Draw(HDC hdc)
 		{
 			m_select->RouteDraw(backDC);
 		}
-		//BitBlt(hdc, 0, 0, clientRect.right + 1, clientRect.bottom + 1, backDC, 0, 0, SRCCOPY);
 		break;
 	}
 	case PawnPromotion:
@@ -513,9 +515,11 @@ PIECE_COLOR GameManager::GetPieceColor(RECT rect)
 
 GameManager::~GameManager()
 {
-	
+	KillTimer(m_hWnd, 1);
+	KillTimer(m_hWnd, 2);
+
 	DeleteDC(backDC);
-	DeleteObject(whiteBrush);
+	
 	for (int i = 0; i < 2; ++i)
 	{
 		for (int j = 0; j < m_pieces[i].size(); ++j)

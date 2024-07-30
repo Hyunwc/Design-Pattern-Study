@@ -50,7 +50,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         DispatchMessage(&msg);
     }
 
- 
+
+    GameManager::Release(); //싱글톤 해제
 
     return (int)msg.wParam;
 }
@@ -163,9 +164,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_ERASEBKGND:
         return 1;
     case WM_DESTROY:
-        KillTimer(hWnd, 1);
-        KillTimer(hWnd, 2);
-        GameManager::Release(); //싱글톤 해제
         PostQuitMessage(0);
         return 0;
     default:

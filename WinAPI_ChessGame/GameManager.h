@@ -43,7 +43,6 @@ private:
 	int width, height;
 	HDC backDC;
 	RECT backRect;
-	HBRUSH whiteBrush;
 	int promotionPos[4][2] =
 	{
 		{2,1},{5,1}, {2,3}, {5,3}
